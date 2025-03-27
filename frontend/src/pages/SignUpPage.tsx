@@ -23,21 +23,35 @@ const SignUpPage = () => {
 
   const { signup, isSigningUp } = useAuthStore();
 
-  const validateForm = () => {
+  const validateForm = (): boolean => {
     const { fullName, email, password } = formData;
 
-    if (!fullName.trim()) return toast.error("Full name is required");
+    if (!fullName.trim()) {
+      toast.error("Full name is required");
+      return false;
+    }
 
-    if (!email.trim()) return toast.error("Email is required");
+    if (!email.trim()) {
+      toast.error("Email is required");
+      return false;
+    }
 
     // check if email is valid
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return toast.error("Email is invalid");
+    if (!emailRegex.test(email)) {
+      toast.error("Email is invalid");
+      return false;
+    }
 
-    if (!password.trim()) return toast.error("Password is required");
+    if (!password.trim()) {
+      toast.error("Password is required");
+      return false;
+    }
 
-    if (password.length < 6)
-      return toast.error("Password must be at least 6 characters long");
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return false;
+    }
 
     return true;
   };
@@ -45,9 +59,7 @@ const SignUpPage = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const success = validateForm();
-
-    if (success === true) await signup(formData);
+    if (validateForm()) await signup(formData);
   };
 
   return (
