@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "build": "tsc --build --versbose",
+    "start:dev": "nodemon src/index.js",
+    "start": "node /dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,8 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "@types/express": "^5.0.1",
+    "nodemon": "^3.1.9",
+    "typescript": "^5.8.3"
   }
 }
