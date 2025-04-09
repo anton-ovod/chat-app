@@ -1,8 +1,10 @@
-import cloudinary from "../lib/cloudinary.js";
-import Message from "../models/message.model.js";
-export const getUsersForSidebar = async (req, res) => {
+import User from "@/models/user.model";
+import cloudinary from "@/lib/cloudinary";
+import { Request, Response } from "express";
+import Message from "@/models/message.model";
+export const getUsersForSidebar = async (req: Request, res: Response) => {
   try {
-    const loggedInUserId = req.user._id;
+    const loggedInUserId = req.user!._id;
     const filteredUsers = await User.find({
       _id: { $ne: loggedInUserId },
     }).select("-password");
@@ -14,10 +16,10 @@ export const getUsersForSidebar = async (req, res) => {
   }
 };
 
-export const getMessages = async (req, res) => {
+export const getMessages = async (req: Request, res: Response) => {
   try {
     const { id: userToChatId } = req.params;
-    const senderId = req.user._id;
+    const senderId = req.user!._id;
 
     const messages = await Message.find({
       $or: [
@@ -33,11 +35,11 @@ export const getMessages = async (req, res) => {
   }
 };
 
-export const sendMessage = async (req, res) => {
+export const sendMessage = async (req: Request, res: Response) => {
   try {
     const { text, image } = req.body;
     const { id: receiverId } = req.params;
-    const senderId = req.user._id;
+    const senderId = req.user!._id;
 
     let imageUrl;
     if (image) {
