@@ -1,16 +1,13 @@
 import cloudinary from "@/lib/cloudinary";
 import User from "@/models/user.model";
-import {
-  MessageResponse,
-  UpdateProfileRequestBody,
-  UserDetailsResponse,
-} from "@/types/express";
+import { UserProfileUpdateRequestBody } from "@/schemas/user.schema";
+import { MessageResponse, UserDetailsResponse } from "@/types/express";
 import { IUser } from "@/types/user";
 import { Request, Response } from "express";
 import { HydratedDocument } from "mongoose";
 
 export const updateProfile = async (
-  req: Request<{}, {}, UpdateProfileRequestBody>,
+  req: Request<{}, {}, UserProfileUpdateRequestBody>,
   res: Response<MessageResponse | UserDetailsResponse>
 ) => {
   try {

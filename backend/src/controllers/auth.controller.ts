@@ -3,14 +3,10 @@ import { Request, Response } from "express";
 import { generateToken } from "@/lib/utils";
 import User from "@/models/user.model";
 import bcrypt from "bcryptjs";
-import {
-  LoginRequestBody,
-  MessageResponse,
-  SignUpRequestBody,
-  UserDetailsResponse,
-} from "@/types/express";
+import { MessageResponse, UserDetailsResponse } from "@/types/express";
 import { IUser } from "@/types/user";
 import { HydratedDocument } from "mongoose";
+import { LoginRequestBody, SignUpRequestBody } from "@/schemas/auth.schema";
 
 export const signup = async (
   req: Request<{}, {}, SignUpRequestBody>,
@@ -19,18 +15,6 @@ export const signup = async (
   const { fullName, email, password } = req.body;
 
   try {
-    if (!fullName || !email || !password) {
-      res.status(400).json({ message: "All fields are required" });
-      return;
-    }
-
-    if (password.length < 6) {
-      res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters long" });
-      return;
-    }
-
     const user: HydratedDocument<IUser> | null = await User.findOne({ email });
 
     if (user) {

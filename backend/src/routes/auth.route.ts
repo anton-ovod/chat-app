@@ -7,12 +7,14 @@ import {
   logout,
   signup,
 } from "@/controllers/auth.controller";
+import { validate } from "@/middlewares/validate.middleware";
+import { loginSchema, signupSchema } from "@/schemas/auth.schema";
 
 const router = Router();
 
-router.post("/signup", signup);
+router.post("/signup", validate(signupSchema), signup);
 
-router.post("/login", login);
+router.post("/login", validate(loginSchema), login);
 
 router.post("/logout", logout);
 

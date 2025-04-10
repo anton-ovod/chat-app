@@ -29,6 +29,9 @@ importers:
       mongoose:
         specifier: ^8.13.2
         version: 8.13.2
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@types/cookie-parser':
         specifier: ^1.4.8
@@ -823,6 +826,9 @@ packages:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
     engines: {node: '>=6'}
 
+  zod@3.24.2:
+    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+
 snapshots:
 
   '@cspotcode/source-map-support@0.8.1':
@@ -1601,3 +1607,5 @@ snapshots:
   wrappy@1.0.2: {}
 
   yn@3.1.1: {}
+
+  zod@3.24.2: {}
