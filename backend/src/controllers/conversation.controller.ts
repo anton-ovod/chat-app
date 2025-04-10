@@ -100,9 +100,10 @@ export const getConversations = async (
   }
 };
 
-export const getConversationByUsername = async (
-  req: Request,
-  res: Response
-) => {
-  // TODO: implement retrieving with pagination all messages between logged in user and the user with the given username
+export const getConversationDetails = async (req: Request, res: Response) => {
+  // TODO: implement retrieving details of a specific conversation
+};
+
+export const deleteConversation = async (req: Request, res: Response) => {
+  //TODO: implement deleting a conversation
 };
