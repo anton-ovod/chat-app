@@ -9,6 +9,14 @@ export const userProfileUpdateSchema = z.object({
       })
       .min(3, "Full name must be at least 3 characters long")
   ),
+  username: z.optional(
+    z
+      .string({
+        invalid_type_error: "Username must be a string",
+      })
+      .min(5, "Username must be at least 5 characters long")
+      .max(20, "Username must be at most 20 characters long")
+  ),
   email: z.optional(
     z
       .string({

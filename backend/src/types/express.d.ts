@@ -14,6 +14,7 @@ export interface MessageResponse {
 export interface UserDetailsResponse {
   _id: string;
   fullName: string;
+  username: string;
   email: string;
   profilePic: string;
 }

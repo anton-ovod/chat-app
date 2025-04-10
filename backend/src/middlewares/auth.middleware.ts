@@ -41,6 +41,7 @@ export const protectRoute = async (
       _id: user._id.toString(),
       fullName: user.fullName,
       email: user.email,
+      username: user.username,
       profilePic: user.profilePic,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,

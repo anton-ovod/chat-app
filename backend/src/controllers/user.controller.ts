@@ -11,7 +11,7 @@ export const updateProfile = async (
   res: Response<MessageResponse | UserDetailsResponse>
 ) => {
   try {
-    const { fullName, email, profilePic } = req.body;
+    const { fullName, username, email, profilePic } = req.body;
     const userId = req.user!._id;
 
     if (!profilePic) {
@@ -41,6 +41,7 @@ export const updateProfile = async (
     res.status(200).json({
       _id: updatedUser._id.toString(),
       fullName: updatedUser.fullName,
+      username: updatedUser.username,
       email: updatedUser.email,
       profilePic: updatedUser.profilePic,
     });

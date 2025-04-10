@@ -12,10 +12,17 @@ export const signup = async (
   req: Request<{}, {}, SignUpRequestBody>,
   res: Response<UserDetailsResponse | MessageResponse>
 ) => {
-  const { fullName, email, password } = req.body;
+  const { fullName, username, email, password } = req.body;
 
   try {
-    const user: HydratedDocument<IUser> | null = await User.findOne({ email });
+    let user: HydratedDocument<IUser> | null = await User.findOne({ email });
+
+    if (user) {
+      res.status(400).json({ message: "User already exists" });
+      return;
+    }
+
+    user = await User.findOne({ username });
 
     if (user) {
       res.status(400).json({ message: "User already exists" });
@@ -27,6 +34,7 @@ export const signup = async (
 
     const newUser: HydratedDocument<IUser> = new User({
       fullName,
+      username,
       email,
       password: hashedPassword,
     });
@@ -37,6 +45,7 @@ export const signup = async (
       res.status(201).json({
         _id: newUser._id.toString(),
         fullName: newUser.fullName,
+        username: newUser.username,
         email: newUser.email,
         profilePic: newUser.profilePic,
       });
@@ -51,10 +60,12 @@ export const login = async (
   req: Request<{}, {}, LoginRequestBody>,
   res: Response<UserDetailsResponse | MessageResponse>
 ) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   try {
-    const user: HydratedDocument<IUser> | null = await User.findOne({ email });
+    const user: HydratedDocument<IUser> | null = await User.findOne({
+      username,
+    });
 
     if (!user) {
       res.status(400).json({ message: "Invalid credentials" });
@@ -73,6 +84,7 @@ export const login = async (
     res.status(200).json({
       _id: user._id.toString(),
       fullName: user.fullName,
+      username: user.username,
       email: user.email,
       profilePic: user.profilePic,
     });
