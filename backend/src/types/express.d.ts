@@ -12,6 +12,12 @@ export interface LoginRequestBody {
   password: string;
 }
 
+export interface UpdateProfileRequestBody {
+  fullName: string;
+  email: string;
+  profilePic: string;
+}
+
 export interface MessageResponse {
   message: string;
 }

@@ -1,14 +1,20 @@
 import cloudinary from "@/lib/cloudinary";
 import User from "@/models/user.model";
-import { MessageResponse, UserDetailsResponse } from "@/types/express";
+import {
+  MessageResponse,
+  UpdateProfileRequestBody,
+  UserDetailsResponse,
+} from "@/types/express";
+import { IUser } from "@/types/user";
 import { Request, Response } from "express";
+import { HydratedDocument } from "mongoose";
 
 export const updateProfile = async (
-  req: Request,
+  req: Request<{}, {}, UpdateProfileRequestBody>,
   res: Response<MessageResponse | UserDetailsResponse>
 ) => {
   try {
-    const { profilePic } = req.body;
+    const { fullName, email, profilePic } = req.body;
     const userId = req.user!._id;
 
     if (!profilePic) {
@@ -23,11 +29,12 @@ export const updateProfile = async (
       return;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePic: uploadResponse.secure_url },
-      { new: true }
-    );
+    const updatedUser: HydratedDocument<IUser> | null =
+      await User.findByIdAndUpdate(
+        userId,
+        { fullName, email, profilePic: uploadResponse.secure_url },
+        { new: true }
+      );
 
     if (!updatedUser) {
       res.status(400).json({ message: "Error updating profile picture" });
