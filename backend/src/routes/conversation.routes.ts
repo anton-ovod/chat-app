@@ -1,7 +1,6 @@
 import {
   createConversation,
   deleteConversation,
-  getConversationDetails,
   getConversations,
 } from "@/controllers/conversation.controller";
 import { protectRoute } from "@/middlewares/auth.middleware";
@@ -18,7 +17,6 @@ router.post(
   validate(createConversationSchema),
   createConversation
 );
-router.get("/:conversationId", protectRoute, getConversationDetails);
 router.delete("/:conversationId", protectRoute, deleteConversation);
 
 export default router;

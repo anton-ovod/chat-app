@@ -37,6 +37,18 @@ export interface MessageDetailsResponse {
   text?: string;
   image?: string;
 }
+
+export interface MessagesListResponse {
+  messages: {
+    _id: string;
+    senderId: string;
+    receiverId: string;
+    text?: string;
+    image?: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
+}
 declare global {
   namespace Express {
     interface Request {

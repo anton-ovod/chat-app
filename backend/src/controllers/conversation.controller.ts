@@ -83,29 +83,25 @@ export const getConversations = async (
       return;
     }
 
-    const formattedConversations = conversations
-      .map((conversation) => {
-        return conversation.participants.filter(
-          (participant) => participant._id.toString() !== userId
-        );
-      })
-      .flat();
-    res.status(200).json({
-      conversations: formattedConversations.map((conversation) => ({
+    const formattedConversations = conversations.map((conversation) => {
+      const otherParticipant = conversation.participants.find(
+        (participant) => participant._id.toString() !== userId.toString()
+      )!;
+      return {
         _id: conversation._id.toString(),
-        fullName: conversation.fullName,
-        username: conversation.username,
-        profilePic: conversation.profilePic,
-      })),
+        fullName: otherParticipant.fullName,
+        username: otherParticipant.username,
+        profilePic: otherParticipant.profilePic,
+      };
+    });
+
+    res.status(200).json({
+      conversations: formattedConversations,
     });
   } catch (error) {
     console.error("Error in getConversations controller: ", error);
     res.status(500).json({ message: "Internal server error" });
   }
-};
-
-export const getConversationDetails = async (req: Request, res: Response) => {
-  // TODO: implement retrieving details of a specific conversation
 };
 
 export const deleteConversation = async (

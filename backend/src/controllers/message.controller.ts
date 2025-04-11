@@ -3,7 +3,11 @@ import cloudinary from "@/lib/cloudinary";
 import { Request, Response } from "express";
 import Message from "@/models/message.model";
 import { SendMessageRequestBody } from "@/schemas/message.schema";
-import { MessageDetailsResponse, MessageResponse } from "@/types/express";
+import {
+  MessageDetailsResponse,
+  MessageResponse,
+  MessagesListResponse,
+} from "@/types/express";
 import Conversation from "@/models/conversation.model";
 
 export const sendMessage = async (
@@ -75,6 +79,47 @@ export const deleteMessage = async (req: Request, res: Response) => {
   // TODO: implement deleting a message with the given messageId
 };
 
-export const getMessages = async (req: Request, res: Response) => {
-  // TODO: implement logic for getting messages with pagination for a conversation
+export const getMessages = async (
+  req: Request<{ username: string }>,
+  res: Response<MessageResponse | MessagesListResponse>
+) => {
+  try {
+    const { username } = req.params;
+    const senderId = req.user._id;
+
+    const receiver = await User.findOne({ username });
+
+    if (!receiver) {
+      res.status(404).json({ message: "Receiver not found" });
+      return;
+    }
+
+    const conversation = await Conversation.findOne({
+      participants: { $all: [senderId, receiver._id] },
+    });
+
+    if (!conversation) {
+      res.status(404).json({ message: "Conversation not found" });
+      return;
+    }
+
+    const messages = await Message.find({
+      conversationId: conversation._id,
+    });
+
+    res.status(200).json({
+      messages: messages.map((message) => ({
+        _id: message._id.toString(),
+        senderId: message.senderId.toString(),
+        receiverId: message.receiverId.toString(),
+        text: message.text,
+        image: message.image,
+        createdAt: message.createdAt,
+        updatedAt: message.updatedAt,
+      })),
+    });
+  } catch (error) {
+    console.error("Error in getMessages controller: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
