@@ -2,16 +2,20 @@ import User from "@/models/user.model";
 import cloudinary from "@/lib/cloudinary";
 import { Request, Response } from "express";
 import Message from "@/models/message.model";
-import { SendMessageRequestBody } from "@/schemas/message.schema";
+import {
+  MessageIdRequestParams,
+  SendMessageRequestBody,
+} from "@/schemas/message.schema";
 import {
   MessageDetailsResponse,
   MessageResponse,
   MessagesListResponse,
 } from "@/types/express";
 import Conversation from "@/models/conversation.model";
+import { UserIdRequestParams } from "@/schemas/user.schema";
 
 export const sendMessage = async (
-  req: Request<{ username: string }, {}, SendMessageRequestBody>,
+  req: Request<UserIdRequestParams, {}, SendMessageRequestBody>,
   res: Response<MessageResponse | MessageDetailsResponse>
 ) => {
   try {
@@ -73,7 +77,7 @@ export const sendMessage = async (
 };
 
 export const editMessage = async (
-  req: Request<{ messageId: string }, {}, SendMessageRequestBody>,
+  req: Request<MessageIdRequestParams, {}, SendMessageRequestBody>,
   res: Response<MessageResponse | MessageDetailsResponse>
 ) => {
   try {
@@ -131,8 +135,46 @@ export const editMessage = async (
   }
 };
 
-export const deleteMessage = async (req: Request, res: Response) => {
-  // TODO: implement deleting a message with the given messageId
+export const deleteMessage = async (
+  req: Request<MessageIdRequestParams>,
+  res: Response<MessageResponse | MessageDetailsResponse>
+) => {
+  try {
+    const { messageId } = req.params;
+
+    const senderId = req.user._id;
+
+    const message = await Message.findById(messageId);
+    if (!message) {
+      res.status(404).json({ message: "Message not found" });
+      return;
+    }
+
+    if (message.senderId.toString() !== senderId) {
+      res
+        .status(403)
+        .json({ message: "You are not authorized to delete this message" });
+      return;
+    }
+
+    const messageDeleteResult = await Message.deleteOne({ _id: messageId });
+    if (!messageDeleteResult.acknowledged) {
+      res.status(400).json({ message: "Error deleting message" });
+      return;
+    }
+    res.status(200).json({
+      _id: message._id.toString(),
+      senderId: message.senderId.toString(),
+      receiverId: message.receiverId.toString(),
+      text: message.text,
+      image: message.image,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+    });
+  } catch (error) {
+    console.error("Error in deleteMessage controller: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export const getMessages = async (

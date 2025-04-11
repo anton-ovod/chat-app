@@ -2,6 +2,7 @@ import Conversation from "@/models/conversation.model";
 import Message from "@/models/message.model";
 import User from "@/models/user.model";
 import {
+  ConversationIdRequestParams,
   CreateConversationRequestBody,
   DeleteConversationRequestBody,
 } from "@/schemas/conversation.schema";
@@ -105,7 +106,7 @@ export const getConversations = async (
 };
 
 export const deleteConversation = async (
-  req: Request<{ conversationId: string }>,
+  req: Request<ConversationIdRequestParams>,
   res: Response<MessageResponse>
 ) => {
   try {

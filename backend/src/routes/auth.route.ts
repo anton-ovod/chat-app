@@ -12,9 +12,9 @@ import { loginSchema, signupSchema } from "@/schemas/auth.schema";
 
 const router = Router();
 
-router.post("/signup", validate(signupSchema), signup);
+router.post("/signup", validate({ body: signupSchema }), signup);
 
-router.post("/login", validate(loginSchema), login);
+router.post("/login", validate({ body: loginSchema }), login);
 
 router.post("/logout", logout);
 

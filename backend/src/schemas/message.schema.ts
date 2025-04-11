@@ -19,3 +19,14 @@ export const sendMessageSchema = z
   });
 
 export type SendMessageRequestBody = z.infer<typeof sendMessageSchema>;
+
+export const MessageIdSchema = z.object({
+  messageId: z
+    .string({
+      required_error: "Message ID is required",
+      invalid_type_error: "Message ID must be a string",
+    })
+    .length(24, "Message ID must be exactly 24 characters long"),
+});
+
+export type MessageIdRequestParams = z.infer<typeof MessageIdSchema>;
