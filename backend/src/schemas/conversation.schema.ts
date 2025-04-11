@@ -12,3 +12,14 @@ export const createConversationSchema = z.object({
 export type CreateConversationRequestBody = z.infer<
   typeof createConversationSchema
 >;
+
+export const deleteConversationSchema = z.object({
+  conversationId: z.string({
+    required_error: "Conversation ID is required",
+    invalid_type_error: "Conversation ID must be a string",
+  }),
+});
+
+export type DeleteConversationRequestBody = z.infer<
+  typeof deleteConversationSchema
+>;

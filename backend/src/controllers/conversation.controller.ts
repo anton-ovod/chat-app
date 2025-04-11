@@ -1,6 +1,10 @@
 import Conversation from "@/models/conversation.model";
+import Message from "@/models/message.model";
 import User from "@/models/user.model";
-import { CreateConversationRequestBody } from "@/schemas/conversation.schema";
+import {
+  CreateConversationRequestBody,
+  DeleteConversationRequestBody,
+} from "@/schemas/conversation.schema";
 import {
   ConversationDetailsResponse,
   MessageResponse,
@@ -104,6 +108,41 @@ export const getConversationDetails = async (req: Request, res: Response) => {
   // TODO: implement retrieving details of a specific conversation
 };
 
-export const deleteConversation = async (req: Request, res: Response) => {
-  //TODO: implement deleting a conversation
+export const deleteConversation = async (
+  req: Request<{}, {}, DeleteConversationRequestBody>,
+  res: Response<MessageResponse>
+) => {
+  try {
+    const { conversationId } = req.body;
+
+    const conversation = await Conversation.findById(conversationId);
+
+    if (!conversation) {
+      res.status(404).json({ message: "Conversation not found" });
+      return;
+    }
+
+    const deleteMessagesResult = await Message.deleteMany({ conversationId });
+
+    if (!deleteMessagesResult.acknowledged) {
+      res.status(400).json({ message: "Error deleting messages" });
+      return;
+    }
+
+    const deleteConversationResult = await Conversation.deleteOne({
+      _id: conversationId,
+    });
+
+    if (!deleteConversationResult.acknowledged) {
+      res.status(400).json({ message: "Error deleting conversation" });
+      return;
+    }
+
+    res.status(200).json({
+      message: `Conversation with ${deleteMessagesResult.deletedCount} messages deleted.`,
+    });
+  } catch (error) {
+    console.error("Error in deleteConversation controller: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
