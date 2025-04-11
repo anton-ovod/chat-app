@@ -18,7 +18,12 @@ router.post(
   validate(sendMessageSchema),
   sendMessage
 );
-router.put("/edit/:messageId", protectRoute, editMessage);
+router.put(
+  "/edit/:messageId",
+  protectRoute,
+  validate(sendMessageSchema),
+  editMessage
+);
 router.delete("/delete/:messageId", protectRoute, deleteMessage);
 
 export default router;

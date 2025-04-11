@@ -33,9 +33,10 @@ export interface MessageDetailsResponse {
   _id: string;
   senderId: string;
   receiverId: string;
-  conversationId: string;
   text?: string;
   image?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface MessagesListResponse {

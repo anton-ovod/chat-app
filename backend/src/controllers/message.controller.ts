@@ -61,9 +61,10 @@ export const sendMessage = async (
       _id: newMessage._id.toString(),
       senderId: newMessage.senderId.toString(),
       receiverId: newMessage.receiverId.toString(),
-      conversationId: newMessage.conversationId.toString(),
       text: newMessage.text,
       image: newMessage.image,
+      createdAt: newMessage.createdAt,
+      updatedAt: newMessage.updatedAt,
     });
   } catch (error) {
     console.error("Error in sendMessage controller: ", error);
@@ -71,8 +72,63 @@ export const sendMessage = async (
   }
 };
 
-export const editMessage = async (req: Request, res: Response) => {
-  // TODO: implement editing a message with the given messageId
+export const editMessage = async (
+  req: Request<{ messageId: string }, {}, SendMessageRequestBody>,
+  res: Response<MessageResponse | MessageDetailsResponse>
+) => {
+  try {
+    const { messageId } = req.params;
+    const { text, image } = req.body;
+
+    const senderId = req.user._id;
+
+    const oldMessage = await Message.findById(messageId);
+
+    if (!oldMessage) {
+      res.status(404).json({ message: "Message not found" });
+      return;
+    }
+
+    if (oldMessage.senderId.toString() !== senderId) {
+      res
+        .status(403)
+        .json({ message: "You are not authorized to edit this message" });
+      return;
+    }
+
+    let imageUrl: string | undefined = undefined;
+    if (image) {
+      const uploadResponse = await cloudinary.uploader.upload(image);
+      if (!uploadResponse) {
+        res.status(400).json({ message: "Error uploading image" });
+        return;
+      }
+      imageUrl = uploadResponse.secure_url;
+    }
+
+    if (text || imageUrl) {
+      oldMessage.text = text || oldMessage.text;
+      oldMessage.image = imageUrl || oldMessage.image;
+      const updatedMessage = await oldMessage.save();
+
+      if (!updatedMessage) {
+        res.status(400).json({ message: "Error updating message" });
+        return;
+      }
+      res.status(200).json({
+        _id: updatedMessage._id.toString(),
+        senderId: updatedMessage.senderId.toString(),
+        receiverId: updatedMessage.receiverId.toString(),
+        text: updatedMessage.text,
+        image: updatedMessage.image,
+        createdAt: updatedMessage.createdAt,
+        updatedAt: updatedMessage.updatedAt,
+      });
+    }
+  } catch (error) {
+    console.error("Error in editMessage controller: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export const deleteMessage = async (req: Request, res: Response) => {

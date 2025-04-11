@@ -29,12 +29,12 @@ export const updateProfile = async (
     const updatedUser: HydratedDocument<IUser> | null =
       await User.findByIdAndUpdate(
         userId,
-        { fullName, email, profilePic: uploadResponse.secure_url },
+        { fullName, email, username, profilePic: uploadResponse.secure_url },
         { new: true }
       );
 
     if (!updatedUser) {
-      res.status(400).json({ message: "Error updating profile picture" });
+      res.status(400).json({ message: "Error updating profile" });
       return;
     }
 

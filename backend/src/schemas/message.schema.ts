@@ -16,7 +16,6 @@ export const sendMessageSchema = z
   })
   .refine((data) => data.text || data.image, {
     message: "Either text or image must be provided",
-    path: [],
   });
 
 export type SendMessageRequestBody = z.infer<typeof sendMessageSchema>;
