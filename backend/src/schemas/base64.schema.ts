@@ -6,6 +6,7 @@ export const base64Schema = z
   .string({
     invalid_type_error: "Base64 string must be a string",
   })
+  .trim()
   .refine((val) => val.startsWith("data:image/"), {
     message: "Invalid image format, should start with 'data:image/'",
   })
