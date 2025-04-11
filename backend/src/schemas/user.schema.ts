@@ -30,3 +30,14 @@ export const userProfileUpdateSchema = z.object({
 export type UserProfileUpdateRequestBody = z.infer<
   typeof userProfileUpdateSchema
 >;
+
+export const userNameSchema = z.object({
+  username: z
+    .string({
+      required_error: "User ID is required",
+      invalid_type_error: "User ID must be a string",
+    })
+    .length(24, "User ID must be exactly 24 characters long"),
+});
+
+export type UserIdRequestParams = z.infer<typeof userNameSchema>;

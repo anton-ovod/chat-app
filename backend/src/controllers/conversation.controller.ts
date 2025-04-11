@@ -1,6 +1,11 @@
 import Conversation from "@/models/conversation.model";
+import Message from "@/models/message.model";
 import User from "@/models/user.model";
-import { CreateConversationRequestBody } from "@/schemas/conversation.schema";
+import {
+  ConversationIdRequestParams,
+  CreateConversationRequestBody,
+  DeleteConversationRequestBody,
+} from "@/schemas/conversation.schema";
 import {
   ConversationDetailsResponse,
   MessageResponse,
@@ -79,20 +84,20 @@ export const getConversations = async (
       return;
     }
 
-    const formattedConversations = conversations
-      .map((conversation) => {
-        return conversation.participants.filter(
-          (participant) => participant._id.toString() !== userId
-        );
-      })
-      .flat();
-    res.status(200).json({
-      conversations: formattedConversations.map((conversation) => ({
+    const formattedConversations = conversations.map((conversation) => {
+      const otherParticipant = conversation.participants.find(
+        (participant) => participant._id.toString() !== userId.toString()
+      )!;
+      return {
         _id: conversation._id.toString(),
-        fullName: conversation.fullName,
-        username: conversation.username,
-        profilePic: conversation.profilePic,
-      })),
+        fullName: otherParticipant.fullName,
+        username: otherParticipant.username,
+        profilePic: otherParticipant.profilePic,
+      };
+    });
+
+    res.status(200).json({
+      conversations: formattedConversations,
     });
   } catch (error) {
     console.error("Error in getConversations controller: ", error);
@@ -100,10 +105,41 @@ export const getConversations = async (
   }
 };
 
-export const getConversationDetails = async (req: Request, res: Response) => {
-  // TODO: implement retrieving details of a specific conversation
-};
+export const deleteConversation = async (
+  req: Request<ConversationIdRequestParams>,
+  res: Response<MessageResponse>
+) => {
+  try {
+    const { conversationId } = req.params;
 
-export const deleteConversation = async (req: Request, res: Response) => {
-  //TODO: implement deleting a conversation
+    const conversation = await Conversation.findById(conversationId);
+
+    if (!conversation) {
+      res.status(404).json({ message: "Conversation not found" });
+      return;
+    }
+
+    const deleteMessagesResult = await Message.deleteMany({ conversationId });
+
+    if (!deleteMessagesResult.acknowledged) {
+      res.status(400).json({ message: "Error deleting messages" });
+      return;
+    }
+
+    const deleteConversationResult = await Conversation.deleteOne({
+      _id: conversationId,
+    });
+
+    if (!deleteConversationResult.acknowledged) {
+      res.status(400).json({ message: "Error deleting conversation" });
+      return;
+    }
+
+    res.status(200).json({
+      message: `Conversation with ${deleteMessagesResult.deletedCount} messages deleted.`,
+    });
+  } catch (error) {
+    console.error("Error in deleteConversation controller: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };

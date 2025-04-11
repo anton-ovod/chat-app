@@ -1,20 +1,47 @@
 import { MessageResponse } from "@/types/express";
 import { Request, Response, NextFunction } from "express";
-import { ZodSchema } from "zod";
+import { z, ZodSchema } from "zod";
 
+type Schemas = {
+  body?: ZodSchema<any>;
+  params?: ZodSchema<any>;
+  query?: ZodSchema<any>;
+};
+
+const handleZodError = (res: Response, error: z.ZodError) => {
+  const { fieldErrors, formErrors } = error.flatten();
+  const message =
+    fieldErrors?.[Object.keys(fieldErrors)[0]]?.[0] ||
+    formErrors?.[0] ||
+    "Invalid input";
+
+  res.status(400).json({ message });
+};
 export const validate =
-  (schema: ZodSchema<any>) =>
+  ({ body, params, query }: Schemas) =>
   (req: Request, res: Response<MessageResponse>, next: NextFunction) => {
-    const result = schema.safeParse(req.body);
+    try {
+      if (body) {
+        const result = body.safeParse(req.body);
+        if (!result.success) return handleZodError(res, result.error);
+        req.body = result.data;
+      }
 
-    if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors;
-      res.status(400).json({
-        message: Object.values(fieldErrors)[0]?.[0] || "Invalid input",
-      });
-      return;
+      if (params) {
+        const result = params.safeParse(req.params);
+        if (!result.success) return handleZodError(res, result.error);
+        req.params = result.data;
+      }
+
+      if (query) {
+        const result = query.safeParse(req.query);
+        if (!result.success) return handleZodError(res, result.error);
+        req.query = result.data;
+      }
+
+      next();
+    } catch (error) {
+      console.error("Error in validation middleware: ", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-
-    req.body = result.data;
-    next();
   };

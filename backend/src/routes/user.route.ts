@@ -9,7 +9,7 @@ const router = express.Router();
 router.put(
   "/update-profile",
   protectRoute,
-  validate(userProfileUpdateSchema),
+  validate({ body: userProfileUpdateSchema }),
   updateProfile
 );
 

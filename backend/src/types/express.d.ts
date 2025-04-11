@@ -28,6 +28,28 @@ export interface ConversationDetailsResponse {
     _id: string;
   }[];
 }
+
+export interface MessageDetailsResponse {
+  _id: string;
+  senderId: string;
+  receiverId: string;
+  text?: string;
+  image?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MessagesListResponse {
+  messages: {
+    _id: string;
+    senderId: string;
+    receiverId: string;
+    text?: string;
+    image?: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
+}
 declare global {
   namespace Express {
     interface Request {
