@@ -109,11 +109,11 @@ export const getConversationDetails = async (req: Request, res: Response) => {
 };
 
 export const deleteConversation = async (
-  req: Request<{}, {}, DeleteConversationRequestBody>,
+  req: Request<{ conversationId: string }>,
   res: Response<MessageResponse>
 ) => {
   try {
-    const { conversationId } = req.body;
+    const { conversationId } = req.params;
 
     const conversation = await Conversation.findById(conversationId);
 
