@@ -1,10 +1,20 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Camera, Mail, User } from "lucide-react";
+import { Camera, Loader2, Mail, User, UserCircle } from "lucide-react";
+import ProfileHeader from "../components/profile/ProfileHeader";
+import ProfilePictureUpload from "../components/profile/picture/ProfilePictureUpload";
+import SubmitButton from "../components/buttons/SubmitButton";
+import InputFieldWithIcon from "../components/forms/inputs/InputFieldWithIcon";
+import OutlineInputField from "../components/forms/inputs/OutlineInputField";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [userProfileData, setUserProfileData] = useState({
+    fullName: authUser!.fullName,
+    username: authUser!.username,
+    email: authUser!.email,
+    profilePic: authUser?.profilePic,
+  });
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -15,80 +25,153 @@ const ProfilePage = () => {
     const reader = new FileReader();
 
     reader.readAsDataURL(file);
-    reader.onload = async () => {
+    reader.onload = () => {
       const base64Image = reader.result as string;
-      setSelectedImage(base64Image);
-      await updateProfile({ ...authUser!, profilePic: base64Image });
+      setUserProfileData({ ...userProfileData, profilePic: base64Image });
     };
   };
 
+  const handleUpdateProfile = async (e: React.MouseEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("Updating profile with data:", userProfileData);
+    if (userProfileData.profilePic?.startsWith("http")) {
+      setUserProfileData({ ...userProfileData, profilePic: undefined });
+    }
+    await updateProfile(userProfileData);
+  };
+
   return (
-    <div className="h-screen pt-20">
+    <div className="min-h-screen pt-20">
       <div className="max-w-2xl mx-auto p-4 py-8">
         <div className="bg-base-300 rounded-xl p-6 space-y-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-semibold">Profile</h1>
-            <p className="mt-2">Your profile information</p>
-          </div>
-
-          {/* Profile Picture Section */}
+          <ProfileHeader title="Profile" subtitle="Your profile information" />
 
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
-              <img
-                src={selectedImage || authUser?.profilePic || "/avatar.png"}
-                alt="Profile pic"
-                className="size-32 rounded-full object-cover border-4"
+              <ProfilePictureUpload
+                profilePicUrl={userProfileData.profilePic}
+                isUpdating={isUpdatingProfile}
+                onUpload={handleImageUpload}
               />
-              <label
-                htmlFor="avatart-upload"
-                className={`
-                  absolute bottom-0 right-0 bg-base-content hover:scale-105 p-2 
-                  rounded-full cursor-pointer transition-all duration-200
-                  ${isUpdatingProfile ? "cursor-not-allowed" : ""}
-                  `}
-              >
-                <Camera className="w-5 h-5 text-base-200" />
-                <input
-                  type="file"
-                  id="avatart-upload"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={isUpdatingProfile}
-                />
-              </label>
             </div>
-            <p className="text-sm text-zinc-400">
-              {isUpdatingProfile
-                ? "Updating..."
-                : "Click the camera icon to update your photo"}
-            </p>
           </div>
 
           {/* Profile Information Section */}
-          <div className="space-y-6">
-            <div className="space-y-1.5">
-              <div className="text-sm text-zinc-400 flex items-center gap-2">
+          <form onSubmit={handleUpdateProfile} className="space-y-6">
+            <OutlineInputField
+              label="Full Name"
+              type="text"
+              value={userProfileData.fullName}
+              onChange={(e) =>
+                setUserProfileData({
+                  ...userProfileData,
+                  fullName: e.target.value,
+                })
+              }
+              icon={User}
+            />
+
+            <OutlineInputField
+              label="Username"
+              type="text"
+              value={userProfileData.username}
+              onChange={(e) =>
+                setUserProfileData({
+                  ...userProfileData,
+                  username: e.target.value,
+                })
+              }
+              icon={UserCircle}
+            />
+
+            <OutlineInputField
+              label="Email"
+              type="email"
+              value={userProfileData.email}
+              onChange={(e) =>
+                setUserProfileData({
+                  ...userProfileData,
+                  email: e.target.value,
+                })
+              }
+              icon={Mail}
+            />
+
+            {/* <div className="space-y-1.5">
+              <label
+                htmlFor="fullName"
+                className="text-sm text-zinc-400 flex items-center gap-2"
+              >
                 <User className="w-4 h-4" />
                 Full Name
-              </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
-                {authUser?.fullName}
-              </p>
+              </label>
+              <input
+                id="fullName"
+                type="text"
+                value={userProfileData.fullName}
+                onChange={(e) =>
+                  setUserProfileData({
+                    ...userProfileData,
+                    fullName: e.target.value,
+                  })
+                }
+                className="px-4 py-2.5 bg-base-200 rounded-lg border w-full"
+              />
             </div>
 
             <div className="space-y-1.5">
-              <div className="text-sm text-zinc-400 flex items-center gap-2">
+              <label
+                htmlFor="username"
+                className="text-sm text-zinc-400 flex items-center gap-2"
+              >
+                <UserCircle className="w-4 h-4" />
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                value={userProfileData.username}
+                onChange={(e) =>
+                  setUserProfileData({
+                    ...userProfileData,
+                    username: e.target.value,
+                  })
+                }
+                className="px-4 py-2.5 bg-base-200 rounded-lg border w-full"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label
+                htmlFor="email"
+                className="text-sm text-zinc-400 flex items-center gap-2"
+              >
                 <Mail className="w-4 h-4" />
                 Email Address
-              </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
-                {authUser?.email}
-              </p>
-            </div>
-          </div>
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={userProfileData.email}
+                onChange={(e) =>
+                  setUserProfileData({
+                    ...userProfileData,
+                    email: e.target.value,
+                  })
+                }
+                className="px-4 py-2.5 bg-base-200 rounded-lg border w-full"
+              />
+            </div> */}
 
+            <div className="text-right pt-4">
+              <SubmitButton
+                isProcessing={isUpdatingProfile}
+                label="Save Changes"
+              />
+            </div>
+          </form>
+
+          {/* Account Information Section */}
           <div className="mt-6 bg-base-300 rounded-xl p-6">
             <h2 className="text-lg font-medium  mb-4">Account Information</h2>
             <div className="space-y-3 text-sm">

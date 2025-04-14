@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 interface AuthUser {
   _id: string;
   fullName: string;
+  username: string;
   email: string;
   profilePic: string;
   createdAt: string;
@@ -17,22 +18,31 @@ interface AuthStore {
   isLoggingIn: boolean;
   isUpdatingProfile: boolean;
   isCheckingAuth: boolean;
+  onlineUsers: string[];
   checkAuth: () => Promise<void>;
   signup: (signup: SignupData) => Promise<void>;
   login: (loginData: LoginData) => Promise<void>;
   logout: () => Promise<void>;
-  updateProfile: (profileData: AuthUser) => Promise<void>;
+  updateProfile: (profileData: ProfileUpdateData) => Promise<void>;
 }
 
 interface SignupData {
   fullName: string;
+  username: string;
   email: string;
   password: string;
 }
 
 interface LoginData {
-  email: string;
+  username: string;
   password: string;
+}
+
+interface ProfileUpdateData {
+  fullName?: string;
+  username?: string;
+  email?: string;
+  profilePic?: string;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -41,14 +51,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
+  onlineUsers: [],
 
   checkAuth: async () => {
     try {
       const response = await axiosInstance.get<AuthUser>("/auth/check");
-
       set({ authUser: response.data });
-    } catch (error) {
-      console.log("Error in checkAuth", error);
+    } catch (error: any) {
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -92,7 +101,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ isUpdatingProfile: true });
     try {
       const response = await axiosInstance.put(
-        "/auth/update-profile",
+        "/user/update-profile",
         profileData
       );
       set({ authUser: response.data });
