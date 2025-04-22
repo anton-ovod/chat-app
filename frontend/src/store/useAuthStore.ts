@@ -1,59 +1,18 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-
-interface AuthUser {
-  _id: string;
-  fullName: string;
-  username: string;
-  email: string;
-  profilePic: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface AuthStore {
-  authUser: AuthUser | null;
-  isSigningUp: boolean;
-  isLoggingIn: boolean;
-  isUpdatingProfile: boolean;
-  isCheckingAuth: boolean;
-  onlineUsers: string[];
-  checkAuth: () => Promise<void>;
-  signup: (signup: SignupData) => Promise<void>;
-  login: (loginData: LoginData) => Promise<void>;
-  logout: () => Promise<void>;
-  updateProfile: (profileData: ProfileUpdateData) => Promise<void>;
-}
-
-interface SignupData {
-  fullName: string;
-  username: string;
-  email: string;
-  password: string;
-}
-
-interface LoginData {
-  username: string;
-  password: string;
-}
-
-interface ProfileUpdateData {
-  fullName?: string;
-  username?: string;
-  email?: string;
-  profilePic?: string;
-}
+import { AuthUser } from "../types/user";
+import { AuthStore } from "../types/auth.store";
 
 export const useAuthStore = create<AuthStore>((set) => ({
   authUser: null,
   isSigningUp: false,
   isLoggingIn: false,
-  isUpdatingProfile: false,
-  isCheckingAuth: true,
+  isCheckingAuth: false,
   onlineUsers: [],
 
   checkAuth: async () => {
+    set({ isCheckingAuth: true });
     try {
       const response = await axiosInstance.get<AuthUser>("/auth/check");
       set({ authUser: response.data });
@@ -63,7 +22,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
       set({ isCheckingAuth: false });
     }
   },
-
   signup: async (signUpData) => {
     set({ isSigningUp: true });
     try {
@@ -97,19 +55,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       toast.error(error.response?.data?.message || "Something went wrong!");
     }
   },
-  updateProfile: async (profileData) => {
-    set({ isUpdatingProfile: true });
-    try {
-      const response = await axiosInstance.put(
-        "/user/update-profile",
-        profileData
-      );
-      set({ authUser: response.data });
-      toast.success("Profile updated successfully!");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Something went wrong!");
-    } finally {
-      set({ isUpdatingProfile: false });
-    }
+  setAuthUser: (user) => {
+    set({ authUser: user });
   },
 }));

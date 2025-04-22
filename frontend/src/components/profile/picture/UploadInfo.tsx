@@ -1,13 +1,15 @@
 import { FC } from "react";
+import { useProfileStore } from "../../../store/useProfileStore";
 
-type UploadInfoProps = {
-  isUpdating: boolean;
+const UploadInfo: FC = () => {
+  const { isUpdatingProfile } = useProfileStore();
+  return (
+    <p className="text-sm text-zinc-400">
+      {isUpdatingProfile
+        ? "Updating..."
+        : "Click the camera icon to update your photo"}
+    </p>
+  );
 };
-
-const UploadInfo: FC<UploadInfoProps> = ({ isUpdating }) => (
-  <p className="text-sm text-zinc-400">
-    {isUpdating ? "Updating..." : "Click the camera icon to update your photo"}
-  </p>
-);
 
 export default UploadInfo;

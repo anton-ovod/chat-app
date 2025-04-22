@@ -1,15 +1,15 @@
 import { FC } from "react";
+import { useProfileStore } from "../../../store/useProfileStore";
 
-type ProfilePicProps = {
-  src?: string;
+const ProfilePic: FC = () => {
+  const { profileData } = useProfileStore();
+  return (
+    <img
+      src={profileData.profilePic || "/avatar.png"}
+      alt="Profile pic"
+      className="size-32 rounded-full object-cover border-4"
+    />
+  );
 };
-
-const ProfilePic: FC<ProfilePicProps> = ({ src }) => (
-  <img
-    src={src || "/avatar.png"}
-    alt="Profile pic"
-    className="size-32 rounded-full object-cover border-4"
-  />
-);
 
 export default ProfilePic;

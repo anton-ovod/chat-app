@@ -1,27 +1,28 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import ProfilePic from "./ProfilePic";
 import UploadOverlay from "./UploadOverlay";
 import UploadInfo from "./UploadInfo";
+import { useProfileStore } from "../../../store/useProfileStore";
+import { useAuthStore } from "../../../store/useAuthStore";
 
-type ProfilePictureUploadProps = {
-  profilePicUrl?: string;
-  isUpdating: boolean;
-  onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+const ProfilePictureUpload: FC = () => {
+  const { setProfileData } = useProfileStore();
+  const { authUser } = useAuthStore();
 
-const ProfilePictureUpload: FC<ProfilePictureUploadProps> = ({
-  profilePicUrl,
-  isUpdating,
-  onUpload,
-}) => {
+  useEffect(() => {
+    if (authUser?.profilePic) {
+      setProfileData((prev) => ({ ...prev, profilePic: authUser.profilePic }));
+    }
+  }, [authUser?.profilePic]);
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative">
-        <ProfilePic src={profilePicUrl} />
-        <UploadOverlay isDisabled={isUpdating} onUpload={onUpload} />
+        <ProfilePic />
+        <UploadOverlay />
       </div>
 
-      <UploadInfo isUpdating={isUpdating} />
+      <UploadInfo />
     </div>
   );
 };
