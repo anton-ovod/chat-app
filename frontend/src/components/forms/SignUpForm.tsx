@@ -66,7 +66,11 @@ const SignUpForm = () => {
         togglePassword={() => setShowPassword(!showPassword)}
       />
 
-      <SubmitButton isProcessing={isSigningUp} label={"Create Account"} />
+      <SubmitButton
+        isProcessing={isSigningUp}
+        label={"Create Account"}
+        className="w-full"
+      />
     </form>
   );
 };

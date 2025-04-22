@@ -39,7 +39,11 @@ const LoginForm = () => {
         togglePassword={() => setShowPassword(!showPassword)}
       />
 
-      <SubmitButton isProcessing={isLoggingIn} label={"Login"} />
+      <SubmitButton
+        isProcessing={isLoggingIn}
+        label={"Login"}
+        className="w-full"
+      />
     </form>
   );
 };
