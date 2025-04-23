@@ -5,20 +5,14 @@ export interface MessageResponse {
   message: string;
 }
 
-export interface UserDetailsResponse {
-  _id: string;
-  fullName: string;
-  username: string;
-  email: string;
-  profilePic: string;
-}
-
 export interface UserConversationsResponse {
   conversations: {
     _id: string;
-    fullName: string;
-    username: string;
-    profilePic: string;
+    receiver: {
+      fullName: string;
+      username: string;
+      profilePic: string;
+    };
   }[];
 }
 

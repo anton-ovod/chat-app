@@ -4,8 +4,8 @@ export interface IUser {
   username: string;
   password: string;
   profilePic: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface AuthenticatedUser {
@@ -14,6 +14,6 @@ export interface AuthenticatedUser {
   username: string;
   email: string;
   profilePic: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
