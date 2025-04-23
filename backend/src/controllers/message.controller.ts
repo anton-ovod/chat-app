@@ -12,10 +12,10 @@ import {
   MessagesListResponse,
 } from "@/types/express";
 import Conversation from "@/models/conversation.model";
-import { UserIdRequestParams } from "@/schemas/user.schema";
+import { UsernameRequestParams } from "@/schemas/user.schema";
 
 export const sendMessage = async (
-  req: Request<UserIdRequestParams, {}, SendMessageRequestBody>,
+  req: Request<UsernameRequestParams, {}, SendMessageRequestBody>,
   res: Response<MessageResponse | MessageDetailsResponse>
 ) => {
   try {
@@ -178,7 +178,7 @@ export const deleteMessage = async (
 };
 
 export const getMessages = async (
-  req: Request<{ username: string }>,
+  req: Request<UsernameRequestParams>,
   res: Response<MessageResponse | MessagesListResponse>
 ) => {
   try {
