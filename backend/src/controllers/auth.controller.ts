@@ -3,14 +3,14 @@ import { Request, Response } from "express";
 import { generateToken } from "@/lib/utils";
 import User from "@/models/user.model";
 import bcrypt from "bcryptjs";
-import { MessageResponse, UserDetailsResponse } from "@/types/express";
-import { IUser } from "@/types/user";
+import { MessageResponse } from "@/types/express";
+import { AuthenticatedUser, IUser } from "@/types/user";
 import { HydratedDocument } from "mongoose";
 import { LoginRequestBody, SignUpRequestBody } from "@/schemas/auth.schema";
 
 export const signup = async (
   req: Request<{}, {}, SignUpRequestBody>,
-  res: Response<UserDetailsResponse | MessageResponse>
+  res: Response<AuthenticatedUser | MessageResponse>
 ) => {
   const { fullName, username, email, password } = req.body;
 
@@ -48,6 +48,8 @@ export const signup = async (
         username: newUser.username,
         email: newUser.email,
         profilePic: newUser.profilePic,
+        createdAt: newUser.createdAt,
+        updatedAt: newUser.updatedAt,
       });
     } else res.status(400).json({ message: "Invalid user data" });
   } catch (error) {
@@ -58,7 +60,7 @@ export const signup = async (
 
 export const login = async (
   req: Request<{}, {}, LoginRequestBody>,
-  res: Response<UserDetailsResponse | MessageResponse>
+  res: Response<AuthenticatedUser | MessageResponse>
 ) => {
   const { username, password } = req.body;
 
@@ -87,6 +89,8 @@ export const login = async (
       username: user.username,
       email: user.email,
       profilePic: user.profilePic,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     });
   } catch (error) {
     console.error("Error in login controller: ", error);
@@ -106,7 +110,7 @@ export const logout = (_: Request, res: Response<MessageResponse>) => {
 
 export const checkAuth = (
   req: Request,
-  res: Response<UserDetailsResponse | MessageResponse>
+  res: Response<AuthenticatedUser | MessageResponse>
 ) => {
   try {
     if (!req.user) {

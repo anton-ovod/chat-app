@@ -77,7 +77,7 @@ export const getConversations = async (
     const userId = req.user._id;
     const conversations = await Conversation.find({
       participants: userId,
-    }).populate("participants", "name username profilePic");
+    }).populate("participants", "fullName username profilePic");
 
     if (!conversations) {
       res.status(404).json({ message: "No conversations found" });
@@ -90,9 +90,11 @@ export const getConversations = async (
       )!;
       return {
         _id: conversation._id.toString(),
-        fullName: otherParticipant.fullName,
-        username: otherParticipant.username,
-        profilePic: otherParticipant.profilePic,
+        receiver: {
+          fullName: otherParticipant.fullName,
+          username: otherParticipant.username,
+          profilePic: otherParticipant.profilePic,
+        },
       };
     });
 

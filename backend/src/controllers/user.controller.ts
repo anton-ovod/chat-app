@@ -1,37 +1,38 @@
 import cloudinary from "@/lib/cloudinary";
 import User from "@/models/user.model";
 import { UserProfileUpdateRequestBody } from "@/schemas/user.schema";
-import { MessageResponse, UserDetailsResponse } from "@/types/express";
-import { IUser } from "@/types/user";
+import { MessageResponse } from "@/types/express";
+import { AuthenticatedUser, IUser } from "@/types/user";
 import { Request, Response } from "express";
 import { HydratedDocument } from "mongoose";
 
 export const updateProfile = async (
   req: Request<{}, {}, UserProfileUpdateRequestBody>,
-  res: Response<MessageResponse | UserDetailsResponse>
+  res: Response<MessageResponse | AuthenticatedUser>
 ) => {
   try {
     const { fullName, username, email, profilePic } = req.body;
     const userId = req.user!._id;
 
-    if (!profilePic) {
-      res.status(400).json({ message: "Profile picture is required" });
-      return;
+    let uploadResponse = null;
+
+    if (profilePic) {
+      uploadResponse = await cloudinary.uploader.upload(profilePic);
+
+      if (!uploadResponse) {
+        res.status(400).json({ message: "Error uploading profile picture" });
+        return;
+      }
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    const updateData: Partial<IUser> = { fullName, email, username };
 
-    if (!uploadResponse) {
-      res.status(400).json({ message: "Error uploading profile picture" });
-      return;
+    if (uploadResponse) {
+      updateData.profilePic = uploadResponse.secure_url;
     }
 
     const updatedUser: HydratedDocument<IUser> | null =
-      await User.findByIdAndUpdate(
-        userId,
-        { fullName, email, username, profilePic: uploadResponse.secure_url },
-        { new: true }
-      );
+      await User.findByIdAndUpdate(userId, updateData, { new: true });
 
     if (!updatedUser) {
       res.status(400).json({ message: "Error updating profile" });
@@ -44,6 +45,8 @@ export const updateProfile = async (
       username: updatedUser.username,
       email: updatedUser.email,
       profilePic: updatedUser.profilePic,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
     });
   } catch (error) {
     console.error("Error in updateProfile controller: ", error);
