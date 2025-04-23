@@ -1,7 +1,10 @@
 import cloudinary from "@/lib/cloudinary";
 import User from "@/models/user.model";
-import { UserProfileUpdateRequestBody } from "@/schemas/user.schema";
-import { MessageResponse } from "@/types/express";
+import {
+  userFullNameRequestParams,
+  UserProfileUpdateRequestBody,
+} from "@/schemas/user.schema";
+import { FoundUsersListResponse, MessageResponse } from "@/types/express";
 import { AuthenticatedUser, IUser } from "@/types/user";
 import { Request, Response } from "express";
 import { HydratedDocument } from "mongoose";
@@ -50,6 +53,32 @@ export const updateProfile = async (
     });
   } catch (error) {
     console.error("Error in updateProfile controller: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const findUserByFullName = async (
+  req: Request<userFullNameRequestParams>,
+  res: Response<FoundUsersListResponse | MessageResponse>
+) => {
+  const { fullName } = req.params;
+
+  const results = await User.find({ $text: { $search: fullName } });
+
+  const formattedResults = results.map((result) => ({
+    _id: result._id.toString(),
+    fullName: result.fullName,
+    username: result.username,
+    profilePic: result.profilePic,
+  }));
+
+  res.status(200).json({
+    users: formattedResults,
+  });
+
+  try {
+  } catch (error) {
+    console.error("Error in findUserByFullName controller: ", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

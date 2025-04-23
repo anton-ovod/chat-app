@@ -40,4 +40,16 @@ export const userNameSchema = z.object({
     .length(24, "User ID must be exactly 24 characters long"),
 });
 
-export type UserIdRequestParams = z.infer<typeof userNameSchema>;
+export type UsernameRequestParams = z.infer<typeof userNameSchema>;
+
+export const userFullNameSchema = z.object({
+  fullName: z
+    .string({
+      required_error: "Full name is required",
+      invalid_type_error: "Full name must be a string",
+    })
+    .min(3, "Full name must be at least 3 characters long")
+    .max(50, "Full name must be at most 50 characters long"),
+});
+
+export type userFullNameRequestParams = z.infer<typeof userFullNameSchema>;

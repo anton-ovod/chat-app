@@ -1,5 +1,6 @@
 import { HydratedDocument, ObjectId } from "mongoose";
 import { AuthenticatedUser, IUser } from "./user";
+import e from "express";
 
 export interface MessageResponse {
   message: string;
@@ -42,6 +43,15 @@ export interface MessagesListResponse {
     image?: string;
     createdAt: Date;
     updatedAt: Date;
+  }[];
+}
+
+export interface FoundUsersListResponse {
+  users: {
+    _id: string;
+    fullName: string;
+    username: string;
+    profilePic: string;
   }[];
 }
 declare global {
