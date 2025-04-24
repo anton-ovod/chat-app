@@ -1,5 +1,5 @@
 export interface Message {
-  id: string;
+  _id: string;
   senderId: number;
   receiverId: number;
   text: string;
@@ -9,7 +9,7 @@ export interface Message {
 }
 
 export interface Conversation {
-  id: string;
+  _id: string;
   receiver: {
     fullName: string;
     username: string;
@@ -30,5 +30,5 @@ export interface ConversationStore {
 
   getConversations: () => Promise<void>;
   getMessages: (username: string) => Promise<void>;
-  setSelectedConversation: (conversation: Conversation) => void;
+  setSelectedConversation: (conversation: Conversation | null) => void;
 }

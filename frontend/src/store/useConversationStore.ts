@@ -44,8 +44,8 @@ export const useConversationStore = create<ConversationStore>((set) => ({
       set({ isMessagesLoading: false });
     }
   },
-  // TODO: optimize this later
-  setSelectedConversation: (conversation: Conversation) => {
+
+  setSelectedConversation: (conversation: Conversation | null) => {
     set({ selectedConversation: conversation });
   },
 }));

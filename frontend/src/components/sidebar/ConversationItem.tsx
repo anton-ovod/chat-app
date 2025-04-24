@@ -1,25 +1,25 @@
 import { FC } from "react";
 import { Conversation } from "../../types/conversation.store";
+import { useConversationStore } from "../../store/useConversationStore";
 
 interface ConversationProps {
   conversation: Conversation;
-  onClick: (conversation: Conversation) => void;
-  isSelected: boolean;
 }
 
-const ConversationItem: FC<ConversationProps> = ({
-  conversation,
-  onClick,
-  isSelected,
-}) => {
+const ConversationItem: FC<ConversationProps> = ({ conversation }) => {
+  const { selectedConversation, setSelectedConversation } =
+    useConversationStore();
   return (
     <button
-      key={conversation.id}
-      onClick={() => onClick(conversation)}
+      onClick={() => setSelectedConversation(conversation)}
       className={`
     w-full p-3 flex items-center gap-3
     hover:bg-base-300 transition-colors
-    ${isSelected ? "bg-base-300 ring-1 ring-base-300" : ""}
+    ${
+      conversation._id === selectedConversation?._id
+        ? "bg-base-300 ring-1 ring-base-300"
+        : ""
+    }
   `}
     >
       <div className="relative mx-auto lg:mx-0">
