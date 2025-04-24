@@ -5,11 +5,9 @@ import {
   Conversation,
   ConversationsResponse,
   ConversationStore,
-  Message,
 } from "../types/conversation.store";
 
 export const useConversationStore = create<ConversationStore>((set) => ({
-  messages: [],
   conversations: [],
   selectedConversation: null,
   isConversationsLoading: false,
@@ -30,22 +28,7 @@ export const useConversationStore = create<ConversationStore>((set) => ({
       set({ isConversationsLoading: false });
     }
   },
-
-  getMessages: async (username: string) => {
-    set({ isMessagesLoading: true });
-    try {
-      const response = await axiosInstance.get<Message[]>(
-        `/messages/${username}`
-      );
-      set({ messages: response.data });
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to fetch messages");
-    } finally {
-      set({ isMessagesLoading: false });
-    }
-  },
-  // TODO: optimize this later
-  setSelectedConversation: (conversation: Conversation) => {
+  setSelectedConversation: (conversation: Conversation | null) => {
     set({ selectedConversation: conversation });
   },
 }));

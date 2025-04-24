@@ -5,13 +5,8 @@ import ConversationsListSkeleton from "../skeletons/ConversationsListSkeleton";
 import NoConversationsFound from "./NoConversationsFound";
 
 const ConversationsList: FC = () => {
-  const {
-    conversations,
-    isConversationsLoading,
-    getConversations,
-    selectedConversation,
-    setSelectedConversation,
-  } = useConversationStore();
+  const { conversations, isConversationsLoading, getConversations } =
+    useConversationStore();
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -28,9 +23,8 @@ const ConversationsList: FC = () => {
       <div className="overflow-y-auto w-full py-3">
         {conversations.map((conversation) => (
           <ConversationItem
+            key={conversation._id}
             conversation={conversation}
-            onClick={setSelectedConversation}
-            isSelected={selectedConversation?.id === conversation.id}
           />
         ))}
 
