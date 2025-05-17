@@ -18,10 +18,14 @@ export interface UserConversationsResponse {
 }
 
 export interface ConversationDetailsResponse {
-  _id: string;
-  participants: {
+  conversation: {
     _id: string;
-  }[];
+    receiver: {
+      fullName: string;
+      username: string;
+      profilePic: string;
+    };
+  };
 }
 
 export interface MessageDetailsResponse {

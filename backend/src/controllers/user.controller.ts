@@ -63,7 +63,11 @@ export const findUserByFullName = async (
 ) => {
   const { fullName } = req.params;
 
-  const results = await User.find({ $text: { $search: fullName } });
+  const currentUserId = req.user?._id;
+  const results = await User.find({
+    $text: { $search: fullName },
+    _id: { $ne: currentUserId },
+  });
 
   const formattedResults = results.map((result) => ({
     _id: result._id.toString(),

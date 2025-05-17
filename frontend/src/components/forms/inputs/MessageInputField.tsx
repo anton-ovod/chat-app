@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { Image } from "lucide-react";
 import { useMessagesStore } from "../../../store/useMessagesStore";
 
-const MessageInput: FC = () => {
+const MessageInputField: FC = () => {
   const { messageContent, setMessageContent } = useMessagesStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,4 +59,4 @@ const MessageInput: FC = () => {
   );
 };
 
-export default MessageInput;
+export default MessageInputField;

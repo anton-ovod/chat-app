@@ -3,10 +3,14 @@ import { MessageContent } from "../../types/messages.store";
 
 interface MessageItemContentProps {
   content: MessageContent;
+  className?: string;
 }
-const MessageItemContent: FC<MessageItemContentProps> = ({ content }) => {
+const MessageItemContent: FC<MessageItemContentProps> = ({
+  content,
+  className,
+}) => {
   return (
-    <div className="chat-bubble flex flex-col">
+    <div className={`chat-bubble flex flex-col ${className ?? ""}`}>
       {content.image && (
         <img
           src={content.image}
