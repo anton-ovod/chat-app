@@ -57,10 +57,14 @@ export const createConversation = async (
     }
 
     res.status(201).json({
-      _id: newConversation._id.toString(),
-      participants: newConversation.participants.map((participant) => ({
-        _id: participant._id.toString(),
-      })),
+      conversation: {
+        _id: newConversation._id.toString(),
+        receiver: {
+          fullName: participant.fullName,
+          username: participant.username,
+          profilePic: participant.profilePic,
+        },
+      },
     });
   } catch (error) {
     console.error("Error in createConversation controller: ", error);

@@ -2,7 +2,7 @@ import { FC } from "react";
 import { useMessagesStore } from "../../store/useMessagesStore";
 import toast from "react-hot-toast";
 import { useConversationStore } from "../../store/useConversationStore";
-import MessageInput from "../forms/inputs/MessageInput";
+import MessageInputField from "./inputs/MessageInputField";
 import SendMessageButton from "../message/SendMessageButton";
 import AttachedImagePreview from "../message/AttachedImagePreview";
 
@@ -35,7 +35,7 @@ const SendMessageForm: FC = () => {
     <div className="p-4 w-full">
       <AttachedImagePreview />
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
-        <MessageInput />
+        <MessageInputField />
 
         <SendMessageButton />
       </form>
