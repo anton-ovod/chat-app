@@ -12,22 +12,22 @@ interface MessageItemProps {
 const MessageItem: FC<MessageItemProps> = ({ message, ref }) => {
   const { authUser } = useAuthStore();
   const { selectedConversation } = useConversationStore();
+  const isSender = message.senderId === authUser!._id;
+
   return (
     <div
       key={message._id}
       ref={ref}
-      className={`chat ${
-        message.senderId === authUser!._id ? "chat-end" : "chat-start"
-      }`}
+      className={`chat ${isSender ? "chat-end" : "chat-start"}`}
     >
       <MessageAvatar
         src={
-          message.senderId === authUser!._id
+          isSender
             ? authUser!.profilePic
             : selectedConversation!.receiver.profilePic
         }
         alt={
-          message.senderId === authUser!._id
+          isSender
             ? authUser!.fullName
             : selectedConversation!.receiver.fullName
         }
@@ -37,6 +37,7 @@ const MessageItem: FC<MessageItemProps> = ({ message, ref }) => {
 
       <MessageItemContent
         content={{ text: message.text, image: message.image }}
+        className={isSender ? "bg-primary text-primary-content" : "bg-base-400"}
       />
     </div>
   );
