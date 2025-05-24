@@ -3,7 +3,7 @@ import { useMessagesStore } from "../../store/useMessagesStore";
 import toast from "react-hot-toast";
 import { useConversationStore } from "../../store/useConversationStore";
 import MessageInputField from "./inputs/MessageInputField";
-import SendMessageButton from "../message/SendMessageButton";
+import SendMessageButton from "../buttons/SendMessageButton";
 import AttachedImagePreview from "../message/AttachedImagePreview";
 
 const SendMessageForm: FC = () => {

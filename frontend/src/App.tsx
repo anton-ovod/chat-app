@@ -29,7 +29,11 @@ const App = () => {
   }
 
   return (
-    <div data-theme={`${theme}`}>
+    <div
+      data-theme={`${theme}`}
+      onContextMenu={(e) => e.preventDefault()}
+      className="min-h-screen"
+    >
       <Navbar />
       <Routes>
         <Route

@@ -3,6 +3,7 @@ import { useMessagesStore } from "../../store/useMessagesStore";
 import MessagesListSkeleton from "../skeletons/MessagesListSkeleton";
 import MessageItem from "./MessageItem";
 import { useConversationStore } from "../../store/useConversationStore";
+import ContextMenu from "./ContextMenu";
 
 const MessagesList = () => {
   const { isMessagesLoading, messages, getMessages } = useMessagesStore();
@@ -30,6 +31,7 @@ const MessagesList = () => {
       {messages.map((message) => (
         <MessageItem key={message._id} message={message} ref={lastMessageRef} />
       ))}
+      <ContextMenu />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import MessageAvatar from "./MessageAvatar";
 import { useConversationStore } from "../../store/useConversationStore";
 import MessageTimeHeader from "./MessageTimeHeader";
 import MessageItemContent from "./MessageItemContent";
+import { useContextMenuStore } from "../../store/useContextMenuStore";
 interface MessageItemProps {
   message: Message;
   ref?: React.Ref<HTMLDivElement>;
@@ -12,7 +13,13 @@ interface MessageItemProps {
 const MessageItem: FC<MessageItemProps> = ({ message, ref }) => {
   const { authUser } = useAuthStore();
   const { selectedConversation } = useConversationStore();
+  const { openMenu } = useContextMenuStore();
   const isSender = message.senderId === authUser!._id;
+
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    openMenu(event.clientX, event.clientY, message);
+  };
 
   return (
     <div
@@ -38,6 +45,11 @@ const MessageItem: FC<MessageItemProps> = ({ message, ref }) => {
       <MessageItemContent
         content={{ text: message.text, image: message.image }}
         className={isSender ? "bg-primary text-primary-content" : "bg-base-400"}
+        onContextMenu={
+          isSender
+            ? handleContextMenu
+            : (event: React.MouseEvent) => event.preventDefault()
+        }
       />
     </div>
   );
