@@ -1,11 +1,20 @@
-import { useEffect } from "react";
+import { FC, useEffect } from "react";
 import { useContextMenuStore } from "../../store/useContextMenuStore";
-
-const ContextMenu = () => {
+interface ContextMenuProps {
+  onDeleteClick: () => void;
+}
+const ContextMenu: FC<ContextMenuProps> = ({ onDeleteClick }) => {
   const { visible, closeMenu, x, y, message } = useContextMenuStore();
+
+  const handleDeleteClick = () => {
+    console.log("Delete message", message);
+    onDeleteClick();
+  };
+
   useEffect(() => {
     const handleClick = () => {
       if (visible) closeMenu();
+      console.log("Context menu closed");
     };
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeMenu();
@@ -22,6 +31,7 @@ const ContextMenu = () => {
 
   return (
     <ul
+      onClick={(e) => e.stopPropagation()}
       className="absolute bg-base-100 shadow-md rounded border border-base-300 py-1"
       style={{
         top: y + 20,
@@ -38,7 +48,7 @@ const ContextMenu = () => {
       </li>
       <li
         className="px-4 py-2 cursor-pointer hover:bg-secondary text-red-600"
-        onClick={() => console.log("Delete message", message)}
+        onClick={handleDeleteClick}
       >
         Delete
       </li>

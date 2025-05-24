@@ -3,10 +3,11 @@ import ChatAvatar from "./ChatAvatar";
 import ChatRecipientInfo from "./ChatRecipientInfo";
 import { useConversationStore } from "../../store/useConversationStore";
 import { useState } from "react";
-import DeleteConversationModal from "../modals/DeleteConversationModal";
+import DeleteItemModal from "../modals/DeleteItemModal";
 
 const ChatHeader = () => {
-  const { setSelectedConversation } = useConversationStore();
+  const { setSelectedConversation, deleteConversation, selectedConversation } =
+    useConversationStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -38,9 +39,10 @@ const ChatHeader = () => {
         </div>
       </div>
 
-      <DeleteConversationModal
+      <DeleteItemModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onDelete={() => deleteConversation(selectedConversation!._id)}
       />
     </>
   );

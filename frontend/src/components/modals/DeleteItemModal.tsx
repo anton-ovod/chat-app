@@ -1,25 +1,20 @@
 import { FC } from "react";
 import { Trash2 } from "lucide-react";
-import { useConversationStore } from "../../store/useConversationStore";
 
-interface DeleteConversationModalProps {
+interface DeleteItemModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onDelete: () => void;
 }
 
-const DeleteConversationModal: FC<DeleteConversationModalProps> = ({
+const DeleteItemModal: FC<DeleteItemModalProps> = ({
   isOpen,
   onClose,
+  onDelete,
 }) => {
-  const { deleteConversation, selectedConversation, setSelectedConversation } =
-    useConversationStore();
-
   const handleDelete = () => {
-    if (selectedConversation) {
-      deleteConversation(selectedConversation._id);
-      setSelectedConversation(null);
-      onClose();
-    }
+    onDelete();
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -29,11 +24,11 @@ const DeleteConversationModal: FC<DeleteConversationModalProps> = ({
       <div className="modal-box">
         <div className="flex items-center gap-2 mb-4">
           <Trash2 className="text-red-500" />
-          <h3 className="font-bold text-lg">Delete Conversation</h3>
+          <h3 className="font-bold text-lg">Delete Item</h3>
         </div>
         <p className="py-2 text-zinc-600">
-          Are you sure you want to permanently delete this conversation? This
-          action cannot be undone.
+          Are you sure you want to permanently delete this item? This action
+          cannot be undone.
         </p>
 
         <div className="modal-action">
@@ -49,4 +44,4 @@ const DeleteConversationModal: FC<DeleteConversationModalProps> = ({
   );
 };
 
-export default DeleteConversationModal;
+export default DeleteItemModal;

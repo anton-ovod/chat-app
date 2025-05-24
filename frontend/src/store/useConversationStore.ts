@@ -45,6 +45,7 @@ export const useConversationStore = create<ConversationStore>((set) => ({
         conversations: state.conversations.filter(
           (conv) => conv._id !== conversationId
         ),
+        selectedConversation: null,
       }));
       toast.success("Conversation deleted");
     } catch (error: any) {
