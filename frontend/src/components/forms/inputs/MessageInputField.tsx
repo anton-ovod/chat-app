@@ -4,11 +4,8 @@ import { Image } from "lucide-react";
 import { useMessagesStore } from "../../../store/useMessagesStore";
 
 const MessageInputField: FC = () => {
-  const {
-    messageContent,
-    setMessageContent,
-    isEditingMessage: editingMessage,
-  } = useMessagesStore();
+  const { messageContent, setMessageContent, editingMessage } =
+    useMessagesStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -33,14 +30,13 @@ const MessageInputField: FC = () => {
   useEffect(() => {
     if (messageContent.image === "") fileInputRef.current!.value = "";
   }, [messageContent.image]);
-  // Focus input field when entering edit mode
+
   useEffect(() => {
     if (editingMessage && inputRef.current) {
       inputRef.current.focus();
     }
   }, [editingMessage]);
 
-  // Add keyboard shortcut for canceling edit mode (Escape key)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && editingMessage) {

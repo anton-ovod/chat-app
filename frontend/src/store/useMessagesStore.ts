@@ -93,7 +93,7 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
       editingMessage: message,
       messageContent: {
         text: message.text,
-        image: message.image || undefined,
+        image: message.image,
       },
     });
   },

@@ -10,7 +10,6 @@ type Schemas = {
 
 const handleZodError = (res: Response, error: z.ZodError) => {
   const { fieldErrors, formErrors } = error.flatten();
-  console.error("Zod validation error: ", fieldErrors, formErrors);
   const message =
     fieldErrors?.[Object.keys(fieldErrors)[0]]?.[0] ||
     formErrors?.[0] ||
