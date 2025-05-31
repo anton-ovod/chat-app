@@ -71,7 +71,6 @@ export const useConversationStore = create<ConversationStore>((set) => ({
   },
   setSelectedConversation: (conversation: Conversation | null) => {
     set({ selectedConversation: conversation });
-    console.log("Selected conversation set to:", conversation);
   },
   getRecipientsByFullName: async (fullName: string) => {
     set({ isSearchingRecipients: true });

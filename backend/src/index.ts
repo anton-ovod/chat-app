@@ -12,6 +12,7 @@ import conversationsRoutes from "./routes/conversation.routes";
 import { Server } from "socket.io";
 import { UserSockets } from "./types/socket";
 import { SOCKET_EVENTS } from "./constants/socket.events";
+import { IMessage } from "./types/message";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -49,23 +50,17 @@ io.on(SOCKET_EVENTS.CONNECTION, (socket) => {
     console.log("Online users:", Object.keys(onlineUsers));
   });
 
-  // socket.on(SOCKET_EVENTS.MESSAGE.SEND, (messageData) => {
-  //   const recipientSockets = onlineUsers[messageData.receiverId];
-  //   if (recipientSockets) {
-  //     recipientSockets.forEach((recipientSocketId) => {
-  //       io.to(recipientSocketId).emit(SOCKET_EVENTS.MESSAGE.RECEIVE, messageData);
-  //     });
-  //   }
-  // });
-
-  // socket.on(SOCKET_EVENTS.USER.TYPING, ({ senderId, receiverId, isTyping }) => {
-  //   const recipientSockets = onlineUsers[receiverId];
-  //   if (recipientSockets) {
-  //     recipientSockets.forEach((recipientSocketId) => {
-  //       io.to(recipientSocketId).emit(SOCKET_EVENTS.USER.TYPING, { senderId, isTyping });
-  //     });
-  //   }
-  // });
+  socket.on(SOCKET_EVENTS.MESSAGE.SEND, (messageData: IMessage) => {
+    const recipientSockets = onlineUsers[messageData.receiverId as string];
+    if (recipientSockets) {
+      recipientSockets.forEach((recipientSocketId) => {
+        io.to(recipientSocketId).emit(
+          SOCKET_EVENTS.MESSAGE.RECEIVE,
+          messageData
+        );
+      });
+    }
+  });
 
   socket.on(SOCKET_EVENTS.DISCONNECT, () => {
     for (const userId in onlineUsers) {

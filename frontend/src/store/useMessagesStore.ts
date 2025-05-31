@@ -6,6 +6,7 @@ import {
 } from "../types/messages.store";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
+import { useSocketStore } from "./useSocketStore";
 
 export const useMessagesStore = create<MessagesStore>((set, get) => ({
   messages: [],
@@ -38,6 +39,7 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
         messageContent
       );
       set({ messages: [...messages, response.data] });
+      useSocketStore.getState().sendMessage(response.data);
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to send message");
     } finally {

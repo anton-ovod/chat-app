@@ -30,11 +30,9 @@ const ConversationItem: FC<ConversationProps> = ({ conversation }) => {
           src={conversation.receiver.profilePic || "/avatar.png"}
           alt={conversation.receiver.fullName}
           className="size-12 object-cover rounded-full"
-        />
+        />{" "}
         {onlineUsers.includes(conversation.receiver._id) && (
-          <div className="absolute right-0 bottom-0 translate-x-1/2 translate-y-1/2">
-            <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
-          </div>
+          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-base-200"></div>
         )}
       </div>
 
@@ -42,6 +40,11 @@ const ConversationItem: FC<ConversationProps> = ({ conversation }) => {
       <div className="hidden lg:block text-left min-w-0">
         <div className="font-medium truncate">
           {conversation.receiver.fullName}
+        </div>
+        <div className="text-xs text-base-content/70">
+          {onlineUsers.includes(conversation.receiver._id)
+            ? "Online"
+            : "Offline"}
         </div>
       </div>
     </button>

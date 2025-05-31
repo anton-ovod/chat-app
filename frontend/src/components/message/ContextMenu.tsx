@@ -8,14 +8,12 @@ const ContextMenu: FC<ContextMenuProps> = ({ onDeleteClick }) => {
   const { visible, closeMenu, x, y, message } = useContextMenuStore();
   const { startEditing } = useMessagesStore();
   const handleDeleteClick = () => {
-    console.log("Delete message", message);
     onDeleteClick();
   };
 
   useEffect(() => {
     const handleClick = () => {
       if (visible) closeMenu();
-      console.log("Context menu closed");
     };
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeMenu();
