@@ -1,4 +1,4 @@
-import { Send, Edit } from "lucide-react";
+import { Send, Edit, Loader2 } from "lucide-react";
 import { useMessagesStore } from "../../store/useMessagesStore";
 import { FC } from "react";
 
@@ -9,7 +9,7 @@ interface SendMessageButtonProps {
 const SendMessageButton: FC<SendMessageButtonProps> = ({
   isEditing = false,
 }) => {
-  const { messageContent } = useMessagesStore();
+  const { isMessageSending, messageContent } = useMessagesStore();
 
   return (
     <button
@@ -17,7 +17,13 @@ const SendMessageButton: FC<SendMessageButtonProps> = ({
       className={`btn btn-sm btn-circle ${isEditing ? "btn-primary" : ""}`}
       disabled={!messageContent.text?.trim() && !messageContent.image}
     >
-      {isEditing ? <Edit size={20} /> : <Send size={22} />}
+      {isMessageSending ? (
+        <Loader2 size={22} className="animate-spin" />
+      ) : isEditing ? (
+        <Edit size={20} />
+      ) : (
+        <Send size={22} />
+      )}
     </button>
   );
 };

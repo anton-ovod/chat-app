@@ -45,6 +45,7 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
     }
   },
   editMessage: async (messageId, content) => {
+    set({ isMessageSending: true });
     try {
       const { messages } = get();
       const response = await axiosInstance.put<Message>(
@@ -59,6 +60,12 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
       toast.success("Message edited successfully");
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to edit message");
+    } finally {
+      set({
+        isMessageSending: false,
+        editingMessage: null,
+        messageContent: { text: "", image: "" },
+      });
     }
   },
   deleteMessage: async (messageId) => {
