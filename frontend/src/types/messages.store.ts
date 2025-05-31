@@ -22,6 +22,7 @@ export interface MessagesStore {
   messageContent: MessageContent;
   isMessagesLoading: boolean;
   isMessageSending: boolean;
+  editingMessage: Message | null;
   getMessages: (username: string) => Promise<void>;
   sendMessage: (username: string) => Promise<void>;
   editMessage: (messageId: string, content: MessageContent) => Promise<void>;
@@ -30,4 +31,6 @@ export interface MessagesStore {
     updater: (prev: MessageContent) => MessageContent
   ) => void;
   resetMessageContent: () => void;
+  startEditing: (message: Message) => void;
+  cancelEditing: () => void;
 }

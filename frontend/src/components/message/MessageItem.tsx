@@ -6,6 +6,7 @@ import { useConversationStore } from "../../store/useConversationStore";
 import MessageTimeHeader from "./MessageTimeHeader";
 import MessageItemContent from "./MessageItemContent";
 import { useContextMenuStore } from "../../store/useContextMenuStore";
+import EditingIndicator from "./EditingIndicator";
 interface MessageItemProps {
   message: Message;
   ref?: React.Ref<HTMLDivElement>;
@@ -39,9 +40,7 @@ const MessageItem: FC<MessageItemProps> = ({ message, ref }) => {
             : selectedConversation!.receiver.fullName
         }
       />
-
-      <MessageTimeHeader createdAt={message.createdAt} />
-
+      <MessageTimeHeader createdAt={message.createdAt} />{" "}
       <MessageItemContent
         content={{ text: message.text, image: message.image }}
         className={isSender ? "bg-primary text-primary-content" : "bg-base-400"}
@@ -51,6 +50,7 @@ const MessageItem: FC<MessageItemProps> = ({ message, ref }) => {
             : (event: React.MouseEvent) => event.preventDefault()
         }
       />
+      {isSender && <EditingIndicator messageId={message._id} />}
     </div>
   );
 };

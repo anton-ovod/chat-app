@@ -4,8 +4,14 @@ import { Image } from "lucide-react";
 import { useMessagesStore } from "../../../store/useMessagesStore";
 
 const MessageInputField: FC = () => {
-  const { messageContent, setMessageContent } = useMessagesStore();
+  const {
+    messageContent,
+    setMessageContent,
+    isEditingMessage: editingMessage,
+  } = useMessagesStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
@@ -27,14 +33,39 @@ const MessageInputField: FC = () => {
   useEffect(() => {
     if (messageContent.image === "") fileInputRef.current!.value = "";
   }, [messageContent.image]);
+  // Focus input field when entering edit mode
+  useEffect(() => {
+    if (editingMessage && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [editingMessage]);
+
+  // Add keyboard shortcut for canceling edit mode (Escape key)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && editingMessage) {
+        const { cancelEditing } = useMessagesStore.getState();
+        cancelEditing();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [editingMessage]);
 
   return (
     <div className="flex-1 flex gap-2">
+      {" "}
       <input
         type="text"
         className="w-full input input-bordered rounded-lg input-sm sm:input-md"
-        placeholder="Type a message..."
+        placeholder={
+          editingMessage ? "Edit your message..." : "Type a message..."
+        }
         value={messageContent.text}
+        ref={inputRef}
         onChange={(e) =>
           setMessageContent((prev) => ({ ...prev, text: e.target.value }))
         }
@@ -46,7 +77,6 @@ const MessageInputField: FC = () => {
         ref={fileInputRef}
         onChange={handleImageChange}
       />
-
       <button
         type="button"
         className={`hidden sm:flex btn btn-circle

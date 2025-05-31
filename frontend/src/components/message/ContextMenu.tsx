@@ -1,11 +1,12 @@
 import { FC, useEffect } from "react";
 import { useContextMenuStore } from "../../store/useContextMenuStore";
+import { useMessagesStore } from "../../store/useMessagesStore";
 interface ContextMenuProps {
   onDeleteClick: () => void;
 }
 const ContextMenu: FC<ContextMenuProps> = ({ onDeleteClick }) => {
   const { visible, closeMenu, x, y, message } = useContextMenuStore();
-
+  const { startEditing } = useMessagesStore();
   const handleDeleteClick = () => {
     console.log("Delete message", message);
     onDeleteClick();
@@ -40,9 +41,13 @@ const ContextMenu: FC<ContextMenuProps> = ({ onDeleteClick }) => {
         minWidth: 120,
       }}
     >
+      {" "}
       <li
         className="px-4 py-2 cursor-pointer hover:bg-secondary"
-        onClick={() => console.log("Edit message", message)}
+        onClick={() => {
+          startEditing(message);
+          closeMenu();
+        }}
       >
         Edit
       </li>

@@ -7,7 +7,11 @@ import {
   sendMessage,
 } from "@/controllers/message.controller";
 import { validate } from "@/middlewares/validate.middleware";
-import { MessageIdSchema, sendMessageSchema } from "@/schemas/message.schema";
+import {
+  editMessageSchema,
+  MessageIdSchema,
+  sendMessageSchema,
+} from "@/schemas/message.schema";
 import { userNameSchema } from "@/schemas/user.schema";
 
 const router = express.Router();
@@ -22,7 +26,7 @@ router.post(
 router.put(
   "/edit/:messageId",
   protectRoute,
-  validate({ params: MessageIdSchema, body: sendMessageSchema }),
+  validate({ params: MessageIdSchema, body: editMessageSchema }),
   editMessage
 );
 router.delete(

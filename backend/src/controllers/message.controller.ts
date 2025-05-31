@@ -38,7 +38,7 @@ export const sendMessage = async (
       return;
     }
 
-    let imageUrl: string | undefined = undefined;
+    let imageUrl: string = "";
     if (image) {
       const uploadResponse = await cloudinary.uploader.upload(image);
       if (!uploadResponse) {
@@ -92,7 +92,6 @@ export const editMessage = async (
       res.status(404).json({ message: "Message not found" });
       return;
     }
-
     if (oldMessage.senderId.toString() !== senderId) {
       res
         .status(403)
@@ -100,35 +99,37 @@ export const editMessage = async (
       return;
     }
 
-    let imageUrl: string | undefined = undefined;
+    let imageUrl: string = "";
     if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image);
-      if (!uploadResponse) {
-        res.status(400).json({ message: "Error uploading image" });
-        return;
+      if (image.startsWith("https://res.cloudinary.com")) {
+        imageUrl = image;
+      } else {
+        const uploadResponse = await cloudinary.uploader.upload(image);
+        if (!uploadResponse) {
+          res.status(400).json({ message: "Error uploading image" });
+          return;
+        }
+        imageUrl = uploadResponse.secure_url;
       }
-      imageUrl = uploadResponse.secure_url;
     }
 
-    if (text || imageUrl) {
-      oldMessage.text = text || oldMessage.text;
-      oldMessage.image = imageUrl || oldMessage.image;
-      const updatedMessage = await oldMessage.save();
+    oldMessage.text = text;
+    oldMessage.image = imageUrl;
+    const updatedMessage = await oldMessage.save();
 
-      if (!updatedMessage) {
-        res.status(400).json({ message: "Error updating message" });
-        return;
-      }
-      res.status(200).json({
-        _id: updatedMessage._id.toString(),
-        senderId: updatedMessage.senderId.toString(),
-        receiverId: updatedMessage.receiverId.toString(),
-        text: updatedMessage.text,
-        image: updatedMessage.image,
-        createdAt: updatedMessage.createdAt,
-        updatedAt: updatedMessage.updatedAt,
-      });
+    if (!updatedMessage) {
+      res.status(400).json({ message: "Error updating message" });
+      return;
     }
+    res.status(200).json({
+      _id: updatedMessage._id.toString(),
+      senderId: updatedMessage.senderId.toString(),
+      receiverId: updatedMessage.receiverId.toString(),
+      text: updatedMessage.text,
+      image: updatedMessage.image,
+      createdAt: updatedMessage.createdAt,
+      updatedAt: updatedMessage.updatedAt,
+    });
   } catch (error) {
     console.error("Error in editMessage controller: ", error);
     res.status(500).json({ message: "Internal server error" });

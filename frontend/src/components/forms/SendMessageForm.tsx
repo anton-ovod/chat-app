@@ -1,6 +1,5 @@
 import { FC } from "react";
 import { useMessagesStore } from "../../store/useMessagesStore";
-import toast from "react-hot-toast";
 import { useConversationStore } from "../../store/useConversationStore";
 import MessageInputField from "./inputs/MessageInputField";
 import SendMessageButton from "../buttons/SendMessageButton";
@@ -11,33 +10,47 @@ const SendMessageForm: FC = () => {
     messageContent,
     sendMessage,
     resetMessageContent,
-    setMessageContent,
+    editingMessage,
+    editMessage,
+    cancelEditing,
   } = useMessagesStore();
   const { selectedConversation } = useConversationStore();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageContent.text?.trim() && !messageContent.image) return;
 
-    try {
-      if (messageContent.image === "") {
-        setMessageContent((prev) => ({ ...prev, image: undefined }));
-      }
+    if (editingMessage) {
+      await editMessage(editingMessage._id, messageContent);
+      cancelEditing();
+    } else {
       await sendMessage(selectedConversation!.receiver.username);
-
-      resetMessageContent();
-    } catch (error) {
-      toast.error("Failed to send message");
-      console.error("Failed to send message:", error);
     }
+
+    resetMessageContent();
   };
   return (
     <div className="p-4 w-full">
+      {editingMessage && (
+        <div className="mb-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-primary">
+              Editing message
+            </span>
+            <button
+              type="button"
+              className="text-xs underline hover:text-primary"
+              onClick={cancelEditing}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
       <AttachedImagePreview />
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
         <MessageInputField />
 
-        <SendMessageButton />
+        <SendMessageButton isEditing={!!editingMessage} />
       </form>
     </div>
   );

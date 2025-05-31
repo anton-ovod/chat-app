@@ -20,9 +20,13 @@ const messageSchema = new mongoose.Schema<IMessage>(
     },
     text: {
       type: String,
+      default: "",
+      trim: true,
     },
     image: {
       type: String,
+      default: "",
+      trim: true,
     },
   },
   { timestamps: true }

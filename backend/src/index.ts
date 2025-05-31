@@ -10,7 +10,6 @@ import messageRoutes from "@/routes/message.route";
 import userRoutes from "@/routes/user.route";
 import conversationsRoutes from "./routes/conversation.routes";
 import { Server } from "socket.io";
-import { setupSocketServer } from "@/sockets";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -32,8 +31,6 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-
-setupSocketServer(io);
 
 server.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);

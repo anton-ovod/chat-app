@@ -15,6 +15,7 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
   },
   isMessagesLoading: false,
   isMessageSending: false,
+  editingMessage: null,
   getMessages: async (username: string) => {
     set({ isMessagesLoading: true });
     try {
@@ -81,6 +82,24 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
   },
   resetMessageContent: () => {
     set({
+      messageContent: {
+        text: "",
+        image: "",
+      },
+    });
+  },
+  startEditing: (message) => {
+    set({
+      editingMessage: message,
+      messageContent: {
+        text: message.text,
+        image: message.image || undefined,
+      },
+    });
+  },
+  cancelEditing: () => {
+    set({
+      editingMessage: null,
       messageContent: {
         text: "",
         image: "",
