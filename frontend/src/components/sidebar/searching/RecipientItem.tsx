@@ -1,14 +1,17 @@
 import { FC } from "react";
 import { ConversationRecipient } from "../../../types/user";
 import { useConversationStore } from "../../../store/useConversationStore";
+import { useSocketStore } from "../../../store/useSocketStore";
 
 interface RecipientItemProps {
   recipient: ConversationRecipient;
+  onClose: () => void;
 }
 
-const RecipientItem: FC<RecipientItemProps> = ({ recipient }) => {
+const RecipientItem: FC<RecipientItemProps> = ({ recipient, onClose }) => {
   const { conversations, createConversation, setSelectedConversation } =
     useConversationStore();
+  const { onlineUsers } = useSocketStore();
 
   const handleClick = async () => {
     const isExist = conversations.find(
@@ -19,6 +22,7 @@ const RecipientItem: FC<RecipientItemProps> = ({ recipient }) => {
     } else {
       createConversation(recipient._id);
     }
+    onClose();
   };
   return (
     <button
@@ -32,6 +36,11 @@ const RecipientItem: FC<RecipientItemProps> = ({ recipient }) => {
           alt={recipient.fullName}
           className="size-10 rounded-full object-cover ring-2 ring-primary group-hover:ring-offset-2 ring-offset-base-100 transition-all duration-200"
         />
+        {onlineUsers.includes(recipient._id) && (
+          <div className="absolute right-0 bottom-0 translate-x-1/2 translate-y-1/2">
+            <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
+          </div>
+        )}
       </div>
 
       {/* User info - only visible on larger screens */}

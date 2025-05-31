@@ -1,9 +1,12 @@
 import { Loader2 } from "lucide-react";
 import { useConversationStore } from "../../../store/useConversationStore";
 import RecipientItem from "./RecipientItem";
-import { useEffect } from "react";
+import { FC, useEffect } from "react";
 
-const FoundRecipientList = () => {
+interface FoundRecipientListProps {
+  onClose: () => void;
+}
+const FoundRecipientList: FC<FoundRecipientListProps> = ({ onClose }) => {
   const { foundRecipients, isSearchingRecipients, clearFoundRecipients } =
     useConversationStore();
 
@@ -26,7 +29,11 @@ const FoundRecipientList = () => {
     <>
       <div className="overflow-y-auto w-full py-3">
         {foundRecipients.map((recipient) => (
-          <RecipientItem key={recipient._id} recipient={recipient} />
+          <RecipientItem
+            key={recipient._id}
+            recipient={recipient}
+            onClose={onClose}
+          />
         ))}
 
         {foundRecipients.length === 0 && (

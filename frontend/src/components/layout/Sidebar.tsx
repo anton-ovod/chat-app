@@ -16,7 +16,7 @@ const Sidebar: FC = () => {
       {isSearchEnabled ? (
         <div className="p-4">
           <RecipientSearchInputField />
-          <FoundRecipientList />
+          <FoundRecipientList onClose={() => setIsSearchEnabled(false)} />
         </div>
       ) : (
         <ConversationsList />

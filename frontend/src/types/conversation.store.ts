@@ -2,11 +2,7 @@ import { ConversationRecipient } from "./user";
 
 export interface Conversation {
   _id: string;
-  receiver: {
-    fullName: string;
-    username: string;
-    profilePic: string;
-  };
+  receiver: ConversationRecipient;
 }
 
 export interface ConversationsResponse {

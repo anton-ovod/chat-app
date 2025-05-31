@@ -10,6 +10,8 @@ import messageRoutes from "@/routes/message.route";
 import userRoutes from "@/routes/user.route";
 import conversationsRoutes from "./routes/conversation.routes";
 import { Server } from "socket.io";
+import { UserSockets } from "./types/socket";
+import { SOCKET_EVENTS } from "./constants/socket.events";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -30,6 +32,54 @@ const io = new Server(server, {
     credentials: true,
     methods: ["GET", "POST"],
   },
+});
+
+const onlineUsers: UserSockets = {};
+
+io.on(SOCKET_EVENTS.CONNECTION, (socket) => {
+  console.log("A user connected:", socket.id);
+
+  socket.on(SOCKET_EVENTS.USER.ONLINE, (userId: string) => {
+    if (!onlineUsers[userId]) {
+      onlineUsers[userId] = new Set();
+    }
+    onlineUsers[userId].add(socket.id);
+
+    io.emit(SOCKET_EVENTS.USERS.ONLINE, Object.keys(onlineUsers));
+    console.log("Online users:", Object.keys(onlineUsers));
+  });
+
+  // socket.on(SOCKET_EVENTS.MESSAGE.SEND, (messageData) => {
+  //   const recipientSockets = onlineUsers[messageData.receiverId];
+  //   if (recipientSockets) {
+  //     recipientSockets.forEach((recipientSocketId) => {
+  //       io.to(recipientSocketId).emit(SOCKET_EVENTS.MESSAGE.RECEIVE, messageData);
+  //     });
+  //   }
+  // });
+
+  // socket.on(SOCKET_EVENTS.USER.TYPING, ({ senderId, receiverId, isTyping }) => {
+  //   const recipientSockets = onlineUsers[receiverId];
+  //   if (recipientSockets) {
+  //     recipientSockets.forEach((recipientSocketId) => {
+  //       io.to(recipientSocketId).emit(SOCKET_EVENTS.USER.TYPING, { senderId, isTyping });
+  //     });
+  //   }
+  // });
+
+  socket.on(SOCKET_EVENTS.DISCONNECT, () => {
+    for (const userId in onlineUsers) {
+      onlineUsers[userId].delete(socket.id);
+
+      if (onlineUsers[userId].size === 0) {
+        delete onlineUsers[userId];
+      }
+    }
+
+    // Broadcast updated online users list to all clients
+    io.emit(SOCKET_EVENTS.USERS.ONLINE, Object.keys(onlineUsers));
+    console.log("User disconnected, online users:", Object.keys(onlineUsers));
+  });
 });
 
 server.listen(PORT, () => {

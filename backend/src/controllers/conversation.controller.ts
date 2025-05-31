@@ -95,6 +95,7 @@ export const getConversations = async (
       return {
         _id: conversation._id.toString(),
         receiver: {
+          _id: otherParticipant._id.toString(),
           fullName: otherParticipant.fullName,
           username: otherParticipant.username,
           profilePic: otherParticipant.profilePic,
