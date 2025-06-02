@@ -3,6 +3,7 @@ import cloudinary from "@/lib/cloudinary";
 import { Request, Response } from "express";
 import Message from "@/models/message.model";
 import {
+  GetMessagesRequestQueryParams,
   MessageIdRequestParams,
   SendMessageRequestBody,
 } from "@/schemas/message.schema";
@@ -179,11 +180,13 @@ export const deleteMessage = async (
 };
 
 export const getMessages = async (
-  req: Request<UsernameRequestParams>,
+  req: Request<UsernameRequestParams, {}, {}, GetMessagesRequestQueryParams>,
   res: Response<MessageResponse | MessagesListResponse>
 ) => {
   try {
     const { username } = req.params;
+    const { before, limit } = req.query;
+
     const senderId = req.user._id;
 
     const receiver = await User.findOne({ username });
@@ -201,10 +204,14 @@ export const getMessages = async (
       res.status(404).json({ message: "Conversation not found" });
       return;
     }
+    const query: any = { conversationId: conversation._id };
+    if (before) {
+      query.createdAt = { $lt: new Date(before) };
+    }
 
-    const messages = await Message.find({
-      conversationId: conversation._id,
-    });
+    const messages = await Message.find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit!);
 
     res.status(200).json({
       messages: messages.map((message) => ({

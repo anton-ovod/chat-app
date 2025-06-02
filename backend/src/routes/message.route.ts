@@ -9,6 +9,7 @@ import {
 import { validate } from "@/middlewares/validate.middleware";
 import {
   editMessageSchema,
+  getMessagesRequestQueryParamsSchema,
   MessageIdSchema,
   sendMessageSchema,
 } from "@/schemas/message.schema";
@@ -16,7 +17,15 @@ import { userNameSchema } from "@/schemas/user.schema";
 
 const router = express.Router();
 
-router.get("/:username", protectRoute, getMessages);
+router.get(
+  "/:username",
+  protectRoute,
+  validate({
+    params: userNameSchema,
+    query: getMessagesRequestQueryParamsSchema,
+  }),
+  getMessages
+);
 router.post(
   "/send/:username",
   protectRoute,
