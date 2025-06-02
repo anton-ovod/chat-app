@@ -34,15 +34,19 @@ const MessagesList = () => {
 
   useEffect(() => {
     if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({ behavior: "instant" });
+      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
   if (isMessagesLoading) return <MessagesListSkeleton />;
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages.map((message) => (
-        <MessageItem key={message._id} message={message} ref={lastMessageRef} />
+      {messages.map((message, idx) => (
+        <MessageItem
+          key={message._id}
+          message={message}
+          ref={idx === messages.length - 1 ? lastMessageRef : undefined}
+        />
       ))}
       <ContextMenu onDeleteClick={() => setDeleteModelOpen(true)} />
       <DeleteItemModal

@@ -40,7 +40,10 @@ const MessageItem: FC<MessageItemProps> = ({ message, ref }) => {
             : selectedConversation!.receiver.fullName
         }
       />
-      <MessageTimeHeader createdAt={message.createdAt} />{" "}
+      <MessageTimeHeader
+        createdAt={message.createdAt}
+        updatedAt={message.updatedAt}
+      />{" "}
       <MessageItemContent
         content={{ text: message.text, image: message.image }}
         className={isSender ? "bg-primary text-primary-content" : "bg-base-400"}
