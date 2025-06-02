@@ -15,9 +15,8 @@ import { useSocketStore } from "./store/useSocketStore";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
-  const theme = useThemeStore((state: any) => state.theme); // TODO: Fix typing
+  const theme = useThemeStore((state: any) => state.theme);
   const { initializeSocket, disconnectSocket } = useSocketStore();
-
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);

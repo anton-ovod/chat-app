@@ -1,14 +1,27 @@
-import { Trash, X } from "lucide-react";
+import { Trash, X, MoreVertical } from "lucide-react";
 import ChatAvatar from "./ChatAvatar";
 import ChatRecipientInfo from "./ChatRecipientInfo";
 import { useConversationStore } from "../../store/useConversationStore";
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import DeleteItemModal from "../modals/DeleteItemModal";
 
 const ChatHeader = () => {
   const { setSelectedConversation, deleteConversation, selectedConversation } =
     useConversationStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
 
   return (
     <>
@@ -19,22 +32,36 @@ const ChatHeader = () => {
             <ChatRecipientInfo />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 relative" ref={menuRef}>
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="text-red-500 hover:text-red-700 transition-colors"
-              title="Delete Conversation"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="p-2 rounded-full hover:bg-base-200 transition-colors"
+              title="More actions"
             >
-              <Trash />
+              <MoreVertical />
             </button>
-
-            <button
-              onClick={() => setSelectedConversation(null)}
-              className="text-zinc-600 hover:text-zinc-800 transition-colors"
-              title="Close"
-            >
-              <X />
-            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-10 z-10 bg-base-100 border border-base-300 rounded shadow-md">
+                <button
+                  onClick={() => {
+                    setIsModalOpen(true);
+                    setMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 justify-center px-4 py-4 text-red-900 hover:bg-base-200"
+                >
+                  <Trash /> Delete
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedConversation(null);
+                    setMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 justify-center px-4 py-4 text-zinc-600 hover:bg-base-200"
+                >
+                  <X /> Close
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
