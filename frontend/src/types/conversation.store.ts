@@ -5,6 +5,15 @@ export interface Conversation {
   receiver: ConversationRecipient;
 }
 
+export interface ExtendedConversationDetails extends Conversation {
+  initiator: ConversationRecipient;
+}
+
+export interface CondensedConversationDetails {
+  _id: string;
+  receiverId: string;
+}
+
 export interface ConversationsResponse {
   conversations: Conversation[];
 }

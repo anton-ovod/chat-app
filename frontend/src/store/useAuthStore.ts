@@ -3,6 +3,7 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { AuthUser } from "../types/user";
 import { AuthStore } from "../types/auth.store";
+import { resetAllState } from "../utils/state.utils";
 
 export const useAuthStore = create<AuthStore>((set) => ({
   authUser: null,
@@ -49,7 +50,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
-      set({ authUser: null });
+      resetAllState();
       toast.success("Logged out successfully!");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Something went wrong!");

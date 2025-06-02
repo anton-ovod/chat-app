@@ -8,8 +8,10 @@ import {
   ConversationsResponse,
   ConversationStore,
 } from "../types/conversation.store";
+import { useSocketStore } from "./useSocketStore";
+import { useAuthStore } from "./useAuthStore";
 
-export const useConversationStore = create<ConversationStore>((set) => ({
+export const useConversationStore = create<ConversationStore>((set, get) => ({
   conversations: [],
   selectedConversation: null,
   isConversationsLoading: false,
@@ -29,6 +31,16 @@ export const useConversationStore = create<ConversationStore>((set) => ({
         conversations: [...state.conversations, newConversation],
         selectedConversation: newConversation,
       }));
+      const { authUser } = useAuthStore.getState();
+      useSocketStore.getState().createConversation({
+        ...newConversation,
+        initiator: {
+          _id: authUser!._id,
+          fullName: authUser!.fullName,
+          username: authUser!.username,
+          profilePic: authUser!.profilePic,
+        },
+      });
       toast.success(
         `Conversation with ${newConversation.receiver.fullName} started`
       );
@@ -41,6 +53,10 @@ export const useConversationStore = create<ConversationStore>((set) => ({
   deleteConversation: async (conversationId: string) => {
     try {
       await axiosInstance.delete(`/conversations/${conversationId}`);
+      useSocketStore.getState().deleteConversation({
+        _id: conversationId,
+        receiverId: get().selectedConversation!.receiver._id,
+      });
       set((state) => ({
         conversations: state.conversations.filter(
           (conv) => conv._id !== conversationId

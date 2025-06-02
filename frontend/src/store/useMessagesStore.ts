@@ -59,6 +59,7 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
         return message;
       });
       set({ messages: updatedMessages });
+      useSocketStore.getState().updateMessage(response.data);
       toast.success("Message edited successfully");
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to edit message");
@@ -80,6 +81,7 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
         (message) => message._id !== response.data._id
       );
       set({ messages: updatedMessages });
+      useSocketStore.getState().deleteMessage(response.data);
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to delete message");
     }
