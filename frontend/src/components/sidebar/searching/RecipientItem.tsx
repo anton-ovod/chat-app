@@ -20,34 +20,43 @@ const RecipientItem: FC<RecipientItemProps> = ({ recipient, onClose }) => {
     if (isExist) {
       setSelectedConversation(isExist);
     } else {
-      createConversation(recipient._id);
+      await createConversation(recipient._id);
     }
     onClose();
   };
+
+  const isOnline = onlineUsers.includes(recipient._id);
+
   return (
     <button
       onClick={() => handleClick()}
-      className="w-full p-3 flex items-center gap-3 
-                hover:bg-base-300 transition-colors"
+      className="w-full p-3 flex items-center gap-3 rounded-lg
+                hover:bg-base-200 transition-colors"
     >
-      <div className="relative mx-auto lg:mx-0">
+      <div className="relative flex-shrink-0">
         <img
           src={recipient.profilePic || "/avatar.png"}
           alt={recipient.fullName}
-          className="size-10 rounded-full object-cover ring-2 ring-primary group-hover:ring-offset-2 ring-offset-base-100 transition-all duration-200"
+          className="size-12 rounded-full object-cover border-2 border-base-300"
         />
-        {onlineUsers.includes(recipient._id) && (
-          <div className="absolute right-0 bottom-0 translate-x-1/2 translate-y-1/2">
-            <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
+        {isOnline && (
+          <div className="absolute right-0 bottom-0 translate-x-1/3 translate-y-1/3">
+            <div className="w-3 h-3 bg-emerald-500 rounded-full border-2 border-base-100" />
           </div>
         )}
       </div>
 
-      {/* User info - only visible on larger screens */}
-      <div className="hidden lg:flex flex-col text-left min-w-0">
-        <span className="font-semibold text-base truncate text-base-content">
-          {recipient.fullName}
-        </span>
+      <div className="flex flex-col text-left min-w-0 overflow-hidden">
+        <div className="flex items-center">
+          <span className="font-medium text-base truncate">
+            {recipient.fullName}
+          </span>
+          {isOnline && (
+            <span className="ml-2 text-xs bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded">
+              online
+            </span>
+          )}
+        </div>
         <span className="text-sm text-base-content/70 truncate">
           @{recipient.username}
         </span>

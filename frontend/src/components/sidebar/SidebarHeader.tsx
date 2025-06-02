@@ -10,10 +10,10 @@ const SidebarHeader: FC<SidebarHeaderProps> = ({ title, onSearchClick }) => {
   return (
     <div className="border-b border-base-300 w-full p-5">
       <div className="flex items-center gap-2">
-        <Users className="size-6" />
+        <Users className="size-6 hidden lg:block" />
         <span className="font-medium hidden lg:block">{title}</span>
         <div
-          className="ml-auto cursor-pointer p-2 hover:bg-base-300 rounded-full transition-colors"
+          className="m-0 lg:ml-auto cursor-pointer p-2 hover:bg-base-300 rounded-full transition-colors"
           onClick={onSearchClick}
         >
           <Search className="size-6" />

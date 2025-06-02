@@ -1,25 +1,30 @@
 import SidebarHeader from "../sidebar/SidebarHeader";
 import ConversationsList from "../sidebar/ConversationsList";
-import { FC, useState } from "react";
-import FoundRecipientList from "../sidebar/searching/FoundRecipientList";
-import RecipientSearchInputField from "../forms/inputs/RecipientSearchInputField";
+import { FC, Dispatch, SetStateAction } from "react";
+import SearchHeader from "../sidebar/searching/SearchHeader";
 
-const Sidebar: FC = () => {
-  const [isSearchEnabled, setIsSearchEnabled] = useState<boolean>(false);
+interface SidebarProps {
+  isSearchEnabled: boolean;
+  setIsSearchEnabled: Dispatch<SetStateAction<boolean>>;
+}
 
+const Sidebar: FC<SidebarProps> = ({ isSearchEnabled, setIsSearchEnabled }) => {
   return (
-    <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
-      <SidebarHeader
-        title="Conversations"
-        onSearchClick={() => setIsSearchEnabled((prev) => !prev)}
-      />
+    <aside
+      className={`h-full border-r border-base-300 flex flex-col transition-all duration-300 ${
+        isSearchEnabled ? "lg:w-72 flex-1 lg:flex-none" : "w-20 lg:w-72"
+      }`}
+    >
       {isSearchEnabled ? (
-        <div className="p-4">
-          <RecipientSearchInputField />
-          <FoundRecipientList onClose={() => setIsSearchEnabled(false)} />
-        </div>
+        <SearchHeader setIsSearchEnabled={setIsSearchEnabled} />
       ) : (
-        <ConversationsList />
+        <>
+          <SidebarHeader
+            title="Conversations"
+            onSearchClick={() => setIsSearchEnabled(true)}
+          />
+          <ConversationsList />
+        </>
       )}
     </aside>
   );
