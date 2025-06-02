@@ -60,6 +60,7 @@ export const createConversation = async (
       conversation: {
         _id: newConversation._id.toString(),
         receiver: {
+          _id: participant._id.toString(),
           fullName: participant.fullName,
           username: participant.username,
           profilePic: participant.profilePic,
@@ -114,7 +115,7 @@ export const getConversations = async (
 
 export const deleteConversation = async (
   req: Request<ConversationIdRequestParams>,
-  res: Response<MessageResponse>
+  res: Response<MessageResponse & { conversationId: string }>
 ) => {
   try {
     const { conversationId } = req.params;
@@ -122,14 +123,18 @@ export const deleteConversation = async (
     const conversation = await Conversation.findById(conversationId);
 
     if (!conversation) {
-      res.status(404).json({ message: "Conversation not found" });
+      res
+        .status(404)
+        .json({ message: "Conversation not found", conversationId });
       return;
     }
 
     const deleteMessagesResult = await Message.deleteMany({ conversationId });
 
     if (!deleteMessagesResult.acknowledged) {
-      res.status(400).json({ message: "Error deleting messages" });
+      res
+        .status(400)
+        .json({ message: "Error deleting messages", conversationId });
       return;
     }
 
@@ -138,15 +143,23 @@ export const deleteConversation = async (
     });
 
     if (!deleteConversationResult.acknowledged) {
-      res.status(400).json({ message: "Error deleting conversation" });
+      res
+        .status(400)
+        .json({ message: "Error deleting conversation", conversationId });
       return;
     }
 
     res.status(200).json({
       message: `Conversation with ${deleteMessagesResult.deletedCount} messages deleted.`,
+      conversationId,
     });
   } catch (error) {
     console.error("Error in deleteConversation controller: ", error);
-    res.status(500).json({ message: "Internal server error" });
+    res
+      .status(500)
+      .json({
+        message: "Internal server error",
+        conversationId: req.params.conversationId,
+      });
   }
 };

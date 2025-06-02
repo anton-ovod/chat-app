@@ -1,6 +1,7 @@
 import { HydratedDocument, ObjectId } from "mongoose";
 import { AuthenticatedUser, IUser } from "./user";
 import e from "express";
+import { ConversationDetails } from "./conversation";
 
 export interface MessageResponse {
   message: string;
@@ -18,14 +19,7 @@ export interface UserConversationsResponse {
 }
 
 export interface ConversationDetailsResponse {
-  conversation: {
-    _id: string;
-    receiver: {
-      fullName: string;
-      username: string;
-      profilePic: string;
-    };
-  };
+  conversation: ConversationDetails;
 }
 
 export interface MessageDetailsResponse {

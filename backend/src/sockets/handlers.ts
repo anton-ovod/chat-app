@@ -2,6 +2,10 @@ import { Socket, Server } from "socket.io";
 import { SOCKET_EVENTS } from "../constants/socket.events";
 import { IMessage } from "../types/message";
 import { UserSockets } from "../types/socket";
+import {
+  CondensedConversationDetails,
+  ExtandedConversationDetails,
+} from "@/types/conversation";
 
 export const setupSocketHandlers = (
   io: Server,
@@ -28,6 +32,56 @@ export const setupSocketHandlers = (
     }
   });
 
+  socket.on(SOCKET_EVENTS.MESSAGE.UPDATE, (updatedMessage: IMessage) => {
+    const recipientSockets = onlineUsers[updatedMessage.receiverId.toString()];
+    if (recipientSockets) {
+      recipientSockets.forEach((sid) => {
+        io.to(sid).emit(SOCKET_EVENTS.MESSAGE.UPDATED, updatedMessage);
+      });
+    }
+  });
+
+  socket.on(SOCKET_EVENTS.MESSAGE.DELETE, (deletedMessage: IMessage) => {
+    const recipientSockets = onlineUsers[deletedMessage.receiverId.toString()];
+    if (recipientSockets) {
+      recipientSockets.forEach((sid) => {
+        io.to(sid).emit(SOCKET_EVENTS.MESSAGE.DELETED, deletedMessage);
+      });
+    }
+  });
+
+  socket.on(
+    SOCKET_EVENTS.CONVERSATION.CREATE,
+    (createdConversation: ExtandedConversationDetails) => {
+      const recipientSockets =
+        onlineUsers[createdConversation.receiver._id.toString()];
+      if (recipientSockets) {
+        recipientSockets.forEach((sid) => {
+          io.to(sid).emit(
+            SOCKET_EVENTS.CONVERSATION.CREATED,
+            createdConversation
+          );
+        });
+      }
+    }
+  );
+
+  socket.on(
+    SOCKET_EVENTS.CONVERSATION.DELETE,
+    (deletedConversation: CondensedConversationDetails) => {
+      const recipientSockets =
+        onlineUsers[deletedConversation.receiverId.toString()];
+      if (recipientSockets) {
+        recipientSockets.forEach((sid) => {
+          io.to(sid).emit(
+            SOCKET_EVENTS.CONVERSATION.DELETED,
+            deletedConversation
+          );
+        });
+      }
+    }
+  );
+
   socket.on(SOCKET_EVENTS.DISCONNECT, () => {
     for (const userId in onlineUsers) {
       onlineUsers[userId].delete(socket.id);
@@ -37,5 +91,6 @@ export const setupSocketHandlers = (
     }
 
     io.emit(SOCKET_EVENTS.USERS.ONLINE, Object.keys(onlineUsers));
+    console.log("User disconnected:", socket.id);
   });
 };
