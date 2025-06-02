@@ -47,7 +47,7 @@ const ChatHeader = () => {
                     setIsModalOpen(true);
                     setMenuOpen(false);
                   }}
-                  className="w-full flex items-center gap-2 justify-center px-4 py-4 text-red-900 hover:bg-base-200"
+                  className="w-full flex items-center gap-2 justify-between px-4 py-4 text-red-900 hover:bg-base-200"
                 >
                   <Trash /> Delete
                 </button>
@@ -56,7 +56,7 @@ const ChatHeader = () => {
                     setSelectedConversation(null);
                     setMenuOpen(false);
                   }}
-                  className="w-full flex items-center gap-2 justify-center px-4 py-4 text-zinc-600 hover:bg-base-200"
+                  className="w-full flex items-center gap-2 justify-between px-4 py-4 text-zinc-600 hover:bg-base-200"
                 >
                   <X /> Close
                 </button>
