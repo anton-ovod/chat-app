@@ -213,8 +213,10 @@ export const getMessages = async (
       .sort({ createdAt: -1 })
       .limit(limit!);
 
+    const orderedMessages = messages.reverse();
+
     res.status(200).json({
-      messages: messages.map((message) => ({
+      messages: orderedMessages.map((message) => ({
         _id: message._id.toString(),
         senderId: message.senderId.toString(),
         receiverId: message.receiverId.toString(),
