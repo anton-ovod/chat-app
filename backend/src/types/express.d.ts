@@ -51,6 +51,7 @@ export interface FoundUsersListResponse {
     username: string;
     profilePic: string;
   }[];
+  totalCount?: number;
 }
 declare global {
   namespace Express {

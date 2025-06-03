@@ -3,6 +3,8 @@ import User from "@/models/user.model";
 import {
   userFullNameRequestParams,
   UserProfileUpdateRequestBody,
+  userSearchQuerySchema,
+  UserSearchQueryParams,
 } from "@/schemas/user.schema";
 import { FoundUsersListResponse, MessageResponse } from "@/types/express";
 import { AuthenticatedUser, IUser } from "@/types/user";
@@ -58,29 +60,38 @@ export const updateProfile = async (
 };
 
 export const findUserByFullName = async (
-  req: Request<userFullNameRequestParams>,
+  req: Request<userFullNameRequestParams, {}, {}, UserSearchQueryParams>,
   res: Response<FoundUsersListResponse | MessageResponse>
 ) => {
-  const { fullName } = req.params;
-
-  const currentUserId = req.user?._id;
-  const results = await User.find({
-    $text: { $search: fullName },
-    _id: { $ne: currentUserId },
-  });
-
-  const formattedResults = results.map((result) => ({
-    _id: result._id.toString(),
-    fullName: result.fullName,
-    username: result.username,
-    profilePic: result.profilePic,
-  }));
-
-  res.status(200).json({
-    users: formattedResults,
-  });
-
   try {
+    const { fullName } = req.params;
+    const limit = req.query.limit;
+    const skip = req.query.skip;
+    const currentUserId = req.user?._id;
+
+    const totalCount = await User.countDocuments({
+      $text: { $search: fullName },
+      _id: { $ne: currentUserId },
+    });
+
+    const results = await User.find({
+      $text: { $search: fullName },
+      _id: { $ne: currentUserId },
+    })
+      .skip(skip!)
+      .limit(limit!);
+
+    const formattedResults = results.map((result) => ({
+      _id: result._id.toString(),
+      fullName: result.fullName,
+      username: result.username,
+      profilePic: result.profilePic,
+    }));
+
+    res.status(200).json({
+      users: formattedResults,
+      totalCount,
+    });
   } catch (error) {
     console.error("Error in findUserByFullName controller: ", error);
     res.status(500).json({ message: "Internal server error" });

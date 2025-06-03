@@ -53,3 +53,9 @@ export const userFullNameSchema = z.object({
 });
 
 export type userFullNameRequestParams = z.infer<typeof userFullNameSchema>;
+
+export const userSearchQuerySchema = z.object({
+  limit: z.coerce.number().min(1).max(50).default(20).optional(),
+  skip: z.coerce.number().min(0).default(0).optional(),
+});
+export type UserSearchQueryParams = z.infer<typeof userSearchQuerySchema>;
