@@ -6,6 +6,7 @@ import {
   CreateConversationRequestBody,
   DeleteConversationRequestBody,
 } from "@/schemas/conversation.schema";
+import { UserSearchQueryParams } from "@/schemas/user.schema";
 import {
   ConversationDetailsResponse,
   MessageResponse,
@@ -74,38 +75,47 @@ export const createConversation = async (
 };
 
 export const getConversations = async (
-  req: Request,
+  req: Request<{}, {}, {}, UserSearchQueryParams>,
   res: Response<MessageResponse | UserConversationsResponse>
 ) => {
-  // TODO: implement pagination for conversations
   try {
     const userId = req.user._id;
+    const limit = req.query.limit;
+    const skip = req.query.skip;
     const conversations = await Conversation.find({
       participants: userId,
-    }).populate("participants", "fullName username profilePic");
+    })
+      .populate("participants", "fullName username profilePic")
+      .skip(skip!)
+      .limit(limit!);
 
     if (!conversations) {
       res.status(404).json({ message: "No conversations found" });
       return;
     }
 
+    const totalCount = await Conversation.countDocuments({
+      participants: userId,
+    });
+
     const formattedConversations = conversations.map((conversation) => {
       const otherParticipant = conversation.participants.find(
         (participant) => participant._id.toString() !== userId.toString()
-      )!;
+      );
       return {
         _id: conversation._id.toString(),
         receiver: {
-          _id: otherParticipant._id.toString(),
-          fullName: otherParticipant.fullName,
-          username: otherParticipant.username,
-          profilePic: otherParticipant.profilePic,
+          _id: otherParticipant!._id.toString(),
+          fullName: otherParticipant!.fullName,
+          username: otherParticipant!.username,
+          profilePic: otherParticipant!.profilePic,
         },
       };
     });
 
     res.status(200).json({
       conversations: formattedConversations,
+      totalCount,
     });
   } catch (error) {
     console.error("Error in getConversations controller: ", error);
@@ -155,11 +165,9 @@ export const deleteConversation = async (
     });
   } catch (error) {
     console.error("Error in deleteConversation controller: ", error);
-    res
-      .status(500)
-      .json({
-        message: "Internal server error",
-        conversationId: req.params.conversationId,
-      });
+    res.status(500).json({
+      message: "Internal server error",
+      conversationId: req.params.conversationId,
+    });
   }
 };

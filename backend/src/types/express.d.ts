@@ -16,6 +16,7 @@ export interface UserConversationsResponse {
       profilePic: string;
     };
   }[];
+  totalCount?: number;
 }
 
 export interface ConversationDetailsResponse {

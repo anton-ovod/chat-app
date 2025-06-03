@@ -8,12 +8,18 @@ import { validate } from "@/middlewares/validate.middleware";
 import {
   conversationIdSchema,
   createConversationSchema,
+  conversationPaginationQuerySchema,
 } from "@/schemas/conversation.schema";
 import { Router } from "express";
 
 const router = Router();
 
-router.get("/", protectRoute, getConversations);
+router.get(
+  "/",
+  protectRoute,
+  validate({ query: conversationPaginationQuerySchema }),
+  getConversations
+);
 router.post(
   "/",
   protectRoute,
