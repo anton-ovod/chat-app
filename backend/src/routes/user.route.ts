@@ -8,6 +8,7 @@ import { validate } from "@/middlewares/validate.middleware";
 import {
   userFullNameSchema,
   userProfileUpdateSchema,
+  userSearchQueryParamsSchema,
 } from "@/schemas/user.schema";
 
 const router = express.Router();
@@ -22,7 +23,7 @@ router.put(
 router.get(
   "/find/:fullName",
   protectRoute,
-  validate({ params: userFullNameSchema }),
+  validate({ params: userFullNameSchema, query: userSearchQueryParamsSchema }),
   findUserByFullName
 );
 

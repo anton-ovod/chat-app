@@ -3,7 +3,6 @@ import User from "@/models/user.model";
 import {
   userFullNameRequestParams,
   UserProfileUpdateRequestBody,
-  userSearchQuerySchema,
   UserSearchQueryParams,
 } from "@/schemas/user.schema";
 import { FoundUsersListResponse, MessageResponse } from "@/types/express";
