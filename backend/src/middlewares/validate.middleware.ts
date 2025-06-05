@@ -24,20 +24,20 @@ export const validate =
       if (body) {
         const result = body.safeParse(req.body);
         if (!result.success) return handleZodError(res, result.error);
-        Object.assign(req.body, result.data);
+        req.body = result.data;
       }
 
       if (params) {
         const result = params.safeParse(req.params);
         if (!result.success) return handleZodError(res, result.error);
-        Object.assign(req.params, result.data);
+        req.params = result.data;
       }
 
       if (query) {
         console.log("Validating query: ", req.query);
         const result = query.safeParse(req.query);
         if (!result.success) return handleZodError(res, result.error);
-        Object.assign(req.query, result.data);
+        req.validatedQuery = result.data;
       }
 
       next();

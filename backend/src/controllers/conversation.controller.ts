@@ -4,15 +4,14 @@ import User from "@/models/user.model";
 import {
   ConversationIdRequestParams,
   CreateConversationRequestBody,
-  DeleteConversationRequestBody,
 } from "@/schemas/conversation.schema";
-import { UserSearchQueryParams } from "@/schemas/user.schema";
+import { PageBasedPaginationQueryParams } from "@/schemas/pagination.scheme";
 import {
   ConversationDetailsResponse,
   MessageResponse,
   UserConversationsResponse,
 } from "@/types/express";
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 
 export const createConversation = async (
   req: Request<{}, {}, CreateConversationRequestBody>,
@@ -75,47 +74,59 @@ export const createConversation = async (
 };
 
 export const getConversations = async (
-  req: Request<{}, {}, {}, UserSearchQueryParams>,
+  req: Request,
   res: Response<MessageResponse | UserConversationsResponse>
 ) => {
   try {
     const userId = req.user._id;
-    const limit = req.query.limit;
-    const skip = req.query.skip;
+    const { page, pageSize } =
+      req.validatedQuery as PageBasedPaginationQueryParams;
+
+    console.log("Page: ", page, "Page Size: ", pageSize);
+
+    const skip = (page - 1) * pageSize;
+
+    const totalCount = await Conversation.countDocuments({
+      participants: userId,
+    });
+
     const conversations = await Conversation.find({
       participants: userId,
     })
       .populate("participants", "fullName username profilePic")
-      .skip(skip!)
-      .limit(limit!);
+      .skip(skip)
+      .limit(pageSize);
 
     if (!conversations) {
       res.status(404).json({ message: "No conversations found" });
       return;
     }
 
-    const totalCount = await Conversation.countDocuments({
-      participants: userId,
-    });
+    const totalPages = Math.ceil(totalCount / pageSize);
 
     const formattedConversations = conversations.map((conversation) => {
       const otherParticipant = conversation.participants.find(
         (participant) => participant._id.toString() !== userId.toString()
-      );
+      )!;
       return {
         _id: conversation._id.toString(),
         receiver: {
-          _id: otherParticipant!._id.toString(),
-          fullName: otherParticipant!.fullName,
-          username: otherParticipant!.username,
-          profilePic: otherParticipant!.profilePic,
+          _id: otherParticipant._id.toString(),
+          fullName: otherParticipant.fullName,
+          username: otherParticipant.username,
+          profilePic: otherParticipant.profilePic,
         },
       };
     });
 
     res.status(200).json({
       conversations: formattedConversations,
-      totalCount,
+      paginationInfo: {
+        totalCount,
+        currentPage: page,
+        totalPages,
+        pageSize: totalCount > pageSize ? pageSize : totalCount,
+      },
     });
   } catch (error) {
     console.error("Error in getConversations controller: ", error);

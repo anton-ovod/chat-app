@@ -2,6 +2,7 @@ import { HydratedDocument, ObjectId } from "mongoose";
 import { AuthenticatedUser, IUser } from "./user";
 import e from "express";
 import { ConversationDetails } from "./conversation";
+import { PageBasedPaginationQueryParams } from "@/schemas/pagination.scheme";
 
 export interface MessageResponse {
   message: string;
@@ -16,7 +17,13 @@ export interface UserConversationsResponse {
       profilePic: string;
     };
   }[];
-  totalCount?: number;
+  paginationInfo: PaginationInfo;
+}
+export interface PaginationInfo {
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
+  totalPages: number;
 }
 
 export interface ConversationDetailsResponse {
@@ -52,12 +59,15 @@ export interface FoundUsersListResponse {
     username: string;
     profilePic: string;
   }[];
-  totalCount?: number;
+  paginationInfo: PaginationInfo;
 }
+
+export type ValidatedQueryType = PageBasedPaginationQueryParams | any;
 declare global {
   namespace Express {
     interface Request {
       user: AuthenticatedUser;
+      validatedQuery: ValidatedQueryType;
     }
   }
 }

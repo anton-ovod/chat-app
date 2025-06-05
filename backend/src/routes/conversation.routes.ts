@@ -8,8 +8,8 @@ import { validate } from "@/middlewares/validate.middleware";
 import {
   conversationIdSchema,
   createConversationSchema,
-  conversationPaginationQuerySchema,
 } from "@/schemas/conversation.schema";
+import { pageBasedPaginationQueryParamsSchema } from "@/schemas/pagination.scheme";
 import { Router } from "express";
 
 const router = Router();
@@ -17,7 +17,9 @@ const router = Router();
 router.get(
   "/",
   protectRoute,
-  validate({ query: conversationPaginationQuerySchema }),
+  validate({
+    query: pageBasedPaginationQueryParamsSchema,
+  }),
   getConversations
 );
 router.post(
