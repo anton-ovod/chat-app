@@ -82,8 +82,6 @@ export const getConversations = async (
     const { page, pageSize } =
       req.validatedQuery as PageBasedPaginationQueryParams;
 
-    console.log("Page: ", page, "Page Size: ", pageSize);
-
     const skip = (page - 1) * pageSize;
 
     const totalCount = await Conversation.countDocuments({
