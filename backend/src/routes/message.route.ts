@@ -9,11 +9,11 @@ import {
 import { validate } from "@/middlewares/validate.middleware";
 import {
   editMessageSchema,
-  getMessagesRequestQueryParamsSchema,
   MessageIdSchema,
   sendMessageSchema,
 } from "@/schemas/message.schema";
 import { userNameSchema } from "@/schemas/user.schema";
+import { limitBasedPaginationQueryParamsSchema } from "@/schemas/pagination.scheme";
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ router.get(
   protectRoute,
   validate({
     params: userNameSchema,
-    query: getMessagesRequestQueryParamsSchema,
+    query: limitBasedPaginationQueryParamsSchema,
   }),
   getMessages
 );

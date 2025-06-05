@@ -3,7 +3,6 @@ import cloudinary from "@/lib/cloudinary";
 import { Request, Response } from "express";
 import Message from "@/models/message.model";
 import {
-  GetMessagesRequestQueryParams,
   MessageIdRequestParams,
   SendMessageRequestBody,
 } from "@/schemas/message.schema";
@@ -14,6 +13,7 @@ import {
 } from "@/types/express";
 import Conversation from "@/models/conversation.model";
 import { UsernameRequestParams } from "@/schemas/user.schema";
+import { LimitBasedPaginationQueryParams } from "@/schemas/pagination.scheme";
 
 export const sendMessage = async (
   req: Request<UsernameRequestParams, {}, SendMessageRequestBody>,
@@ -180,17 +180,16 @@ export const deleteMessage = async (
 };
 
 export const getMessages = async (
-  req: Request<UsernameRequestParams, {}, {}, GetMessagesRequestQueryParams>,
+  req: Request,
   res: Response<MessageResponse | MessagesListResponse>
 ) => {
   try {
     const { username } = req.params;
-    const { before, limit } = req.query;
-
+    const { before, limit, after } =
+      req.validatedQuery as LimitBasedPaginationQueryParams;
     const senderId = req.user._id;
 
     const receiver = await User.findOne({ username });
-
     if (!receiver) {
       res.status(404).json({ message: "Receiver not found" });
       return;
@@ -199,24 +198,47 @@ export const getMessages = async (
     const conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiver._id] },
     });
-
     if (!conversation) {
       res.status(404).json({ message: "Conversation not found" });
       return;
     }
+
     const query: any = { conversationId: conversation._id };
+
+    let sort: 1 | -1 = -1;
+
     if (before) {
       query.createdAt = { $lt: new Date(before) };
+      sort = -1;
+    } else if (after) {
+      query.createdAt = { $gt: new Date(after) };
+      sort = 1;
     }
 
     const messages = await Message.find(query)
-      .sort({ createdAt: -1 })
-      .limit(limit!);
+      .sort({ createdAt: sort })
+      .limit(limit + 1);
 
-    const orderedMessages = messages.reverse();
+    const hasMore = messages.length > limit;
+    const slicedMessages = messages.slice(0, limit);
+    const finalMessages =
+      sort === -1 ? slicedMessages.reverse() : slicedMessages;
+
+    const hasNextPage = sort === -1 ? hasMore : !!after;
+    const hasPreviousPage = sort === 1 ? hasMore : !!before;
+
+    const nextCursor =
+      hasNextPage && finalMessages.length
+        ? finalMessages[0].createdAt.toISOString()
+        : undefined;
+
+    const previousCursor =
+      hasPreviousPage && finalMessages.length
+        ? finalMessages[finalMessages.length - 1].createdAt.toISOString()
+        : undefined;
 
     res.status(200).json({
-      messages: orderedMessages.map((message) => ({
+      messages: finalMessages.map((message) => ({
         _id: message._id.toString(),
         senderId: message.senderId.toString(),
         receiverId: message.receiverId.toString(),
@@ -225,9 +247,16 @@ export const getMessages = async (
         createdAt: message.createdAt,
         updatedAt: message.updatedAt,
       })),
+      paginationInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        nextCursor,
+        previousCursor,
+        limit,
+      },
     });
   } catch (error) {
-    console.error("Error in getMessages controller: ", error);
+    console.error("Error in getMessages controller:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

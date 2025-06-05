@@ -2,7 +2,10 @@ import { HydratedDocument, ObjectId } from "mongoose";
 import { AuthenticatedUser, IUser } from "./user";
 import e from "express";
 import { ConversationDetails } from "./conversation";
-import { PageBasedPaginationQueryParams } from "@/schemas/pagination.scheme";
+import {
+  LimitBasedPaginationQueryParams,
+  PageBasedPaginationQueryParams,
+} from "@/schemas/pagination.scheme";
 
 export interface MessageResponse {
   message: string;
@@ -24,6 +27,14 @@ export interface PaginationInfo {
   currentPage: number;
   pageSize: number;
   totalPages: number;
+}
+
+export interface CursorPaginationInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  nextCursor?: string;
+  previousCursor?: string;
+  limit?: number;
 }
 
 export interface ConversationDetailsResponse {
@@ -50,6 +61,7 @@ export interface MessagesListResponse {
     createdAt: Date;
     updatedAt: Date;
   }[];
+  paginationInfo: CursorPaginationInfo;
 }
 
 export interface FoundUsersListResponse {
@@ -62,7 +74,10 @@ export interface FoundUsersListResponse {
   paginationInfo: PaginationInfo;
 }
 
-export type ValidatedQueryType = PageBasedPaginationQueryParams | any;
+export type ValidatedQueryType =
+  | PageBasedPaginationQueryParams
+  | LimitBasedPaginationQueryParams
+  | any;
 declare global {
   namespace Express {
     interface Request {
