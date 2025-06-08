@@ -5,18 +5,20 @@ type SubmitButtonProps = {
   isProcessing: boolean;
   label: string;
   className?: string;
+  disabled?: boolean;
 };
 
 const SubmitButton: FC<SubmitButtonProps> = ({
   isProcessing,
   label,
   className = "",
+  disabled,
 }) => {
   return (
     <button
       type="submit"
       className={`btn btn-primary ${className}`}
-      disabled={isProcessing}
+      disabled={isProcessing || disabled}
     >
       {isProcessing ? (
         <>

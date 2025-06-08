@@ -21,15 +21,17 @@ const ProfileUpdateForm = () => {
     }
   }, [authUser, setProfileData]);
 
+  const isIdenticalProfileData = () => {
+    return (
+      profileData.fullName === authUser?.fullName &&
+      profileData.username === authUser?.username &&
+      profileData.email === authUser?.email &&
+      profileData.profilePic === authUser?.profilePic
+    );
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setProfileData((prev) => {
-      if (prev.profilePic?.startsWith("http")) {
-        const { profilePic, ...rest } = prev;
-        return { ...rest };
-      }
-      return prev;
-    });
     await updateProfile();
   };
 
@@ -75,7 +77,11 @@ const ProfileUpdateForm = () => {
       />
 
       <div className="text-right pt-4">
-        <SubmitButton isProcessing={isUpdatingProfile} label="Save Changes" />
+        <SubmitButton
+          isProcessing={isUpdatingProfile}
+          disabled={isIdenticalProfileData()}
+          label="Save Changes"
+        />
       </div>
     </form>
   );

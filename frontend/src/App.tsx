@@ -24,14 +24,12 @@ const App = () => {
   useEffect(() => {
     if (authUser) {
       initializeSocket();
-    } else {
-      disconnectSocket();
     }
 
     return () => {
       disconnectSocket();
     };
-  }, [authUser, initializeSocket, disconnectSocket]);
+  }, [authUser?._id, initializeSocket, disconnectSocket]);
 
   if (isCheckingAuth && !authUser) {
     return (
