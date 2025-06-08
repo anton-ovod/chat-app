@@ -34,7 +34,6 @@ export const validate =
       }
 
       if (query) {
-        console.log("Validating query: ", req.query);
         const result = query.safeParse(req.query);
         if (!result.success) return handleZodError(res, result.error);
         req.validatedQuery = result.data;
