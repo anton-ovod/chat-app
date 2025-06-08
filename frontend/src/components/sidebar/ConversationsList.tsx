@@ -1,26 +1,29 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { useConversationStore } from "../../store/useConversationStore";
 import ConversationItem from "./ConversationItem";
 import ConversationsListSkeleton from "../skeletons/ConversationsListSkeleton";
 import NoConversationsFound from "./NoConversationsFound";
+import PaginationControls from "./PaginationControls";
 
 const ConversationsList: FC = () => {
-  const { conversations, isConversationsLoading, getConversations } =
-    useConversationStore();
+  const {
+    conversations,
+    isConversationsLoading,
+    getConversations,
+    paginationInfo,
+  } = useConversationStore();
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    const fetchConversations = async () => {
-      await getConversations();
-    };
-    fetchConversations();
-  }, []);
+    getConversations(page);
+  }, [page, getConversations]);
 
   if (isConversationsLoading && !conversations.length)
     return <ConversationsListSkeleton />;
 
   return (
     <>
-      <div className="overflow-y-auto w-full py-3">
+      <div className="overflow-y-auto w-full py-3 h-full">
         {conversations.map((conversation) => (
           <ConversationItem
             key={conversation._id}
@@ -32,6 +35,15 @@ const ConversationsList: FC = () => {
           <NoConversationsFound message="No conversations found" />
         )}
       </div>
+      {paginationInfo && (
+        <div className="hidden lg:block">
+          <PaginationControls
+            page={page}
+            setPage={setPage}
+            totalPages={paginationInfo.totalPages}
+          />
+        </div>
+      )}
     </>
   );
 };

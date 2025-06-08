@@ -1,14 +1,21 @@
+import PaginationControls from "../PaginationControls";
 import { Loader2, UserX } from "lucide-react";
 import { useConversationStore } from "../../../store/useConversationStore";
 import RecipientItem from "./RecipientItem";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 
 interface FoundRecipientListProps {
   onClose: () => void;
 }
 const FoundRecipientList: FC<FoundRecipientListProps> = ({ onClose }) => {
-  const { foundRecipients, isSearchingRecipients, clearFoundRecipients } =
-    useConversationStore();
+  const {
+    foundRecipients,
+    isSearchingRecipients,
+    clearFoundRecipients,
+    foundRecipientsPagination,
+    getRecipientsByFullName,
+  } = useConversationStore();
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     return () => {
@@ -30,8 +37,9 @@ const FoundRecipientList: FC<FoundRecipientListProps> = ({ onClose }) => {
       {foundRecipients.length > 0 ? (
         <>
           <div className="text-xs text-base-content/70 px-1 mb-2">
-            {foundRecipients.length}{" "}
-            {foundRecipients.length === 1 ? "user" : "users"} found
+            {foundRecipientsPagination?.totalCount}{" "}
+            {foundRecipientsPagination?.totalCount === 1 ? "user" : "users"}{" "}
+            found
           </div>
           <div className="overflow-y-auto flex-1 space-y-1">
             {foundRecipients.map((recipient) => (
@@ -42,6 +50,17 @@ const FoundRecipientList: FC<FoundRecipientListProps> = ({ onClose }) => {
               />
             ))}
           </div>
+          {foundRecipientsPagination &&
+            foundRecipientsPagination.totalPages > 1 && (
+              <PaginationControls
+                page={page}
+                setPage={(p) => {
+                  setPage(p);
+                  getRecipientsByFullName(p);
+                }}
+                totalPages={foundRecipientsPagination.totalPages}
+              />
+            )}
         </>
       ) : (
         <div className="flex flex-col items-center justify-center h-full text-base-content/70">

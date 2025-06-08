@@ -41,3 +41,5 @@ export const PREVIEW_MESSAGES = [
     isSent: true,
   },
 ];
+
+export const DEFAULT_PAGE_SIZE = 9;

@@ -1,4 +1,5 @@
 import { ConversationRecipient } from "./user";
+import { PaginationInfo } from "./pagination";
 
 export interface Conversation {
   _id: string;
@@ -16,6 +17,7 @@ export interface CondensedConversationDetails {
 
 export interface ConversationsResponse {
   conversations: Conversation[];
+  paginationInfo: PaginationInfo;
 }
 
 export interface ConversationResponse {
@@ -24,6 +26,7 @@ export interface ConversationResponse {
 
 export interface ConversationRecipientsResponse {
   users: ConversationRecipient[];
+  paginationInfo?: PaginationInfo;
 }
 
 export interface ConversationStore {
@@ -32,11 +35,14 @@ export interface ConversationStore {
   isConversationsLoading: boolean;
   isSearchingRecipients: boolean;
   foundRecipients: ConversationRecipient[];
-
+  foundRecipientsPagination?: PaginationInfo;
+  paginationInfo?: PaginationInfo;
+  foundRecipientsSearchTerm: string;
   createConversation: (participantId: string) => Promise<void>;
   deleteConversation: (conversationId: string) => Promise<void>;
-  getConversations: () => Promise<void>;
+  getConversations: (page?: number, pageSize?: number) => Promise<void>;
   setSelectedConversation: (conversation: Conversation | null) => void;
-  getRecipientsByFullName: (fullName: string) => Promise<void>;
+  getRecipientsByFullName: (page?: number, pageSize?: number) => Promise<void>;
+  setFoundRecipientsSearchTerm: (searchTerm: string) => void;
   clearFoundRecipients: () => void;
 }

@@ -10,6 +10,7 @@ import {
 } from "../types/conversation.store";
 import { useSocketStore } from "./useSocketStore";
 import { useAuthStore } from "./useAuthStore";
+import { DEFAULT_PAGE_SIZE } from "../constants";
 
 export const useConversationStore = create<ConversationStore>((set, get) => ({
   conversations: [],
@@ -17,6 +18,9 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
   isConversationsLoading: false,
   isSearchingRecipients: false,
   foundRecipients: [],
+  foundRecipientsPagination: undefined,
+  paginationInfo: undefined,
+  foundRecipientsSearchTerm: "",
 
   createConversation: async (participantId: string) => {
     try {
@@ -70,13 +74,16 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
       );
     }
   },
-  getConversations: async () => {
+  getConversations: async (page = 1, pageSize = DEFAULT_PAGE_SIZE) => {
     set({ isConversationsLoading: true });
     try {
       const response = await axiosInstance.get<ConversationsResponse>(
-        "/conversations"
+        `/conversations?page=${page}&pageSize=${pageSize}`
       );
-      set({ conversations: response.data.conversations });
+      set({
+        conversations: response.data.conversations,
+        paginationInfo: response.data.paginationInfo,
+      });
     } catch (error: any) {
       toast.error(
         error?.response?.data?.message || "Failed to fetch conversations"
@@ -88,20 +95,24 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
   setSelectedConversation: (conversation: Conversation | null) => {
     set({ selectedConversation: conversation });
   },
-  getRecipientsByFullName: async (fullName: string) => {
+  getRecipientsByFullName: async (page = 1, pageSize = DEFAULT_PAGE_SIZE) => {
     set({ isSearchingRecipients: true });
+    const searchTerm = get().foundRecipientsSearchTerm;
     try {
       const response = await axiosInstance.get<ConversationRecipientsResponse>(
-        `/user/find/${fullName}`
+        `/user/find/${searchTerm}?page=${page}&pageSize=${pageSize}`
       );
-      set({ foundRecipients: response.data.users });
+      set({
+        foundRecipients: response.data.users,
+        foundRecipientsPagination: response.data.paginationInfo,
+      });
     } catch (error: any) {
-      toast.error(
-        error?.response?.data?.message || "Failed to fetch recipients"
-      );
+      console.error("Error fetching recipients:", error);
     } finally {
       set({ isSearchingRecipients: false });
     }
   },
+  setFoundRecipientsSearchTerm: (searchTerm: string) =>
+    set({ foundRecipientsSearchTerm: searchTerm }),
   clearFoundRecipients: () => set({ foundRecipients: [] }),
 }));
