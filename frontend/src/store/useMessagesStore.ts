@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import {
+  CursorPaginationParams,
   Message,
   MessagesResponse,
   MessagesStore,
@@ -17,13 +18,23 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
   isMessagesLoading: false,
   isMessageSending: false,
   editingMessage: null,
-  getMessages: async (username: string) => {
-    set({ isMessagesLoading: true });
+  getMessages: async (username: string, params?: CursorPaginationParams) => {
+    if (!params?.after && !params?.before) {
+      set({ isMessagesLoading: true });
+    }
     try {
       const response = await axiosInstance.get<MessagesResponse>(
-        `/messages/${username}`
+        `/messages/${username}`,
+        { params }
       );
-      set({ messages: response.data.messages });
+      const { messages, paginationInfo } = response.data;
+      set({
+        messages:
+          params?.after || params?.before
+            ? [...messages, ...get().messages]
+            : messages,
+        paginationInfo,
+      });
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to fetch messages");
     } finally {

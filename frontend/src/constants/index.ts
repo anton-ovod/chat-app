@@ -43,3 +43,5 @@ export const PREVIEW_MESSAGES = [
 ];
 
 export const DEFAULT_PAGE_SIZE = 9;
+
+export const DEFAULT_MESSAGES_PAGE_SIZE = 20;

@@ -13,8 +13,23 @@ export interface MessageContent {
   image?: string;
 }
 
+export interface CursorPaginationInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  nextCursor?: string;
+  previousCursor?: string;
+  limit?: number;
+}
+
+export interface CursorPaginationParams {
+  before?: string;
+  after?: string;
+  limit?: number;
+}
+
 export interface MessagesResponse {
   messages: Message[];
+  paginationInfo?: CursorPaginationInfo;
 }
 
 export interface MessagesStore {
@@ -23,7 +38,11 @@ export interface MessagesStore {
   isMessagesLoading: boolean;
   isMessageSending: boolean;
   editingMessage: Message | null;
-  getMessages: (username: string) => Promise<void>;
+  paginationInfo?: CursorPaginationInfo;
+  getMessages: (
+    username: string,
+    params?: CursorPaginationParams
+  ) => Promise<void>;
   sendMessage: (username: string) => Promise<void>;
   editMessage: (messageId: string, content: MessageContent) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
