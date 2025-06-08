@@ -3,6 +3,8 @@ import { ProfileStore } from "../types/profile.store";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
+import { isBase64Image } from "../utils/image.utils";
+import { AuthUser } from "../types/user";
 
 export const useProfileStore = create<ProfileStore>((set, get) => ({
   profileData: {},
@@ -11,9 +13,13 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
   updateProfile: async () => {
     set({ isUpdatingProfile: true });
     try {
-      const response = await axiosInstance.put(
+      const updatedProfileData = get().profileData;
+      if (!isBase64Image(updatedProfileData.profilePic)) {
+        updatedProfileData.profilePic = undefined;
+      }
+      const response = await axiosInstance.put<AuthUser>(
         "/user/update-profile",
-        get().profileData
+        updatedProfileData
       );
       useAuthStore.getState().setAuthUser(response.data);
       toast.success("Profile updated successfully!");

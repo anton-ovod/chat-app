@@ -12,11 +12,11 @@ const ProfileUpdateForm = () => {
 
   useEffect(() => {
     if (authUser) {
-      setProfileData((prev) => ({
-        ...prev,
+      setProfileData(() => ({
         fullName: authUser.fullName,
         username: authUser.username,
         email: authUser.email,
+        profilePic: authUser.profilePic,
       }));
     }
   }, [authUser, setProfileData]);

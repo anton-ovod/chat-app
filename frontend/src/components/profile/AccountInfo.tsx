@@ -2,7 +2,6 @@ import { useAuthStore } from "../../store/useAuthStore";
 
 const AccountInfo = () => {
   const { authUser } = useAuthStore();
-  console.log("AccountInfo", authUser);
   return (
     <div className="mt-6 bg-base-300 rounded-xl p-6">
       <h2 className="text-lg font-medium  mb-4">Account Information</h2>
