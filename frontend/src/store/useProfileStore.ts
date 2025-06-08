@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
 import { isBase64Image } from "../utils/image.utils";
 import { AuthUser } from "../types/user";
+import { useSocketStore } from "./useSocketStore";
 
 export const useProfileStore = create<ProfileStore>((set, get) => ({
   profileData: {},
@@ -21,6 +22,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
         "/user/update-profile",
         updatedProfileData
       );
+      useSocketStore.getState().updateProfile(response.data);
       useAuthStore.getState().setAuthUser(response.data);
       toast.success("Profile updated successfully!");
     } catch (error: any) {

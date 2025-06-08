@@ -52,7 +52,10 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
       set({ messages: [...messages, response.data] });
       useSocketStore.getState().sendMessage(response.data);
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to send message");
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to send message. Image may be too large."
+      );
     } finally {
       set({ isMessageSending: false });
     }

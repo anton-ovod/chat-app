@@ -6,6 +6,7 @@ import {
   CondensedConversationDetails,
   ExtandedConversationDetails,
 } from "@/types/conversation";
+import { AuthenticatedUser } from "@/types/user";
 
 export const setupSocketHandlers = (
   io: Server,
@@ -79,6 +80,13 @@ export const setupSocketHandlers = (
           );
         });
       }
+    }
+  );
+
+  socket.on(
+    SOCKET_EVENTS.PROFILE.UPDATE,
+    (updatedProfile: AuthenticatedUser) => {
+      io.emit(SOCKET_EVENTS.PROFILE.UPDATED, updatedProfile);
     }
   );
 

@@ -41,12 +41,13 @@ export const sendMessage = async (
 
     let imageUrl: string = "";
     if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image);
-      if (!uploadResponse) {
-        res.status(400).json({ message: "Error uploading image" });
+      try {
+        const uploadResponse = await cloudinary.uploader.upload(image);
+        imageUrl = uploadResponse.secure_url;
+      } catch (error) {
+        res.status(400).json({ message: "Image is too large" });
         return;
       }
-      imageUrl = uploadResponse.secure_url;
     }
 
     const newMessage = new Message({

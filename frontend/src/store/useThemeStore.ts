@@ -1,6 +1,5 @@
 import { create } from "zustand";
 
-// TODO: Add proper typing
 type ThemeOption = string;
 
 interface ThemeState {

@@ -21,4 +21,8 @@ export const SOCKET_EVENTS = {
     DELETE: "message:delete",
     DELETED: "message:deleted",
   },
+  PROFILE: {
+    UPDATE: "profile:update",
+    UPDATED: "profile:updated",
+  },
 };

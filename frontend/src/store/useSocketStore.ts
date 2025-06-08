@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import { useAuthStore } from "./useAuthStore";
 import { useMessagesStore } from "./useMessagesStore";
 import { Message } from "../types/messages.store";
@@ -8,18 +8,8 @@ import {
   CondensedConversationDetails,
   ExtendedConversationDetails,
 } from "../types/conversation.store";
-
-interface SocketStore {
-  socket: Socket | null;
-  onlineUsers: string[];
-  initializeSocket: () => void;
-  disconnectSocket: () => void;
-  sendMessage: (message: Message) => void;
-  updateMessage: (updateMessage: Message) => void;
-  deleteMessage: (deletedMessage: Message) => void;
-  createConversation: (conversation: ExtendedConversationDetails) => void;
-  deleteConversation: (conversation: CondensedConversationDetails) => void;
-}
+import { AuthUser } from "../types/user";
+import { SocketStore } from "../types/socket.store";
 
 export const useSocketStore = create<SocketStore>((set, get) => ({
   socket: null,
@@ -101,6 +91,29 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       }
     );
 
+    socket.on("profile:updated", (updatedProfile: AuthUser) => {
+      const { conversations, selectedConversation } =
+        useConversationStore.getState();
+      const updatedConversations = conversations.map((conv) => {
+        if (conv.receiver._id === updatedProfile._id) {
+          return {
+            ...conv,
+            receiver: updatedProfile,
+          };
+        }
+        return conv;
+      });
+      if (selectedConversation?.receiver._id === updatedProfile._id) {
+        useConversationStore.setState({
+          selectedConversation: {
+            ...selectedConversation,
+            receiver: updatedProfile,
+          },
+        });
+      }
+      useConversationStore.setState({ conversations: updatedConversations });
+    });
+
     socket.on("disconnect", () => {
       console.log("Socket disconnected");
     });
@@ -148,6 +161,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     const { socket } = get();
     if (socket) {
       socket.emit("message:send", message);
+    }
+  },
+
+  updateProfile: (updatedProfile: AuthUser) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("profile:update", updatedProfile);
     }
   },
 }));
