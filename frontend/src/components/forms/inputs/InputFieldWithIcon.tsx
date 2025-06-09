@@ -36,6 +36,7 @@ const InputFieldWithIcon: FC<FormInputProps> = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          required
         />
         {type === "password" && (
           <button
