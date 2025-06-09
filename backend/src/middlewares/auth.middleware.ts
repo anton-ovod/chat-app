@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { MessageResponse } from "@/types/express";
 import { HydratedDocument } from "mongoose";
 import { IUser } from "@/types/user";
+import { generateToken, isHalfExpired } from "@/lib/utils";
 
 export const protectRoute = async (
   req: Request,
@@ -11,7 +12,8 @@ export const protectRoute = async (
   next: NextFunction
 ) => {
   try {
-    const token: string = req.cookies.jwt;
+    const token: string =
+      req.cookies[process.env.JWT_TOKEN_NAME || "chat_app_token"];
     if (!token) {
       res.status(401).json({ message: "Unauthorized - No token provided" });
       return;
@@ -27,6 +29,8 @@ export const protectRoute = async (
       res.status(401).json({ message: "Unauthorized - Invalid token" });
       return;
     }
+
+    if (isHalfExpired(decoded)) generateToken(decoded.userId, res);
 
     const user: HydratedDocument<IUser> | null = await User.findById(
       decoded.userId

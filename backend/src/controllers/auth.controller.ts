@@ -100,7 +100,9 @@ export const login = async (
 
 export const logout = (_: Request, res: Response<MessageResponse>) => {
   try {
-    res.cookie("jwt", "", { maxAge: 0 });
+    res.cookie(process.env.JWT_TOKEN_NAME || "chat_app_token", "", {
+      maxAge: 0,
+    });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.error("Error in logout controller: ", error);
