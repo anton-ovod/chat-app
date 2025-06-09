@@ -41,7 +41,7 @@ const MessagesList = () => {
     if (selectedConversation) {
       fetchMessages();
     }
-  }, [selectedConversation, getMessages]);
+  }, [selectedConversation?._id, getMessages]);
 
   useEffect(() => {
     if (containerRef.current) {

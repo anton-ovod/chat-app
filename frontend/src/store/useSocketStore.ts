@@ -67,8 +67,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       "conversation:created",
       (newConversation: ExtendedConversationDetails) => {
         const { conversations } = useConversationStore.getState();
+        const newConversationWithReceiver = {
+          ...newConversation,
+          receiver: newConversation.initiator,
+          initiator: undefined,
+        };
         useConversationStore.setState({
-          conversations: [...conversations, newConversation],
+          conversations: [...conversations, newConversationWithReceiver],
         });
       }
     );
